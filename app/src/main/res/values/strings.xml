@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CycleLens</string>
+    <string name="card_id">Card ID</string>
+    <string name="observe">OBSERVE</string>
+    <string name="observations">Observations: %1$d</string>
+    <string name="discovered_cards">Discovered cards: %1$d</string>
+    <string name="no_cards_observed">No cards observed yet.</string>
+    <string name="played_since">Played since: %1$d</string>
+    <string name="until_available">Until available: %1$d</string>
+    <string name="until_available_now">Until available: AVAILABLE</string>
+    <string name="undo">UNDO</string>
+    <string name="reset">RESET</string>
+</resources>

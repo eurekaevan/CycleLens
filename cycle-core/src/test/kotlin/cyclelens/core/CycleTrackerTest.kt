@@ -150,6 +150,115 @@ class CycleTrackerTest {
         assertEquals(setOf(HOG, LOG), tracker.discoveredCards())
     }
 
+    @Test
+    fun `undo on an empty history returns null`() {
+        val tracker = CycleTracker()
+
+        assertNull(tracker.undoLast())
+        assertEquals(0, tracker.observationCount())
+    }
+
+    @Test
+    fun `undo removes the most recent observation`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+        tracker.observe(LOG)
+
+        assertEquals(LOG, tracker.undoLast())
+
+        assertEquals(2, tracker.observationCount())
+        assertEquals(1, tracker.cardsPlayedSince(FIREBALL))
+        assertEquals(0, tracker.cardsPlayedSince(KNIGHT))
+    }
+
+    @Test
+    fun `undo removes a card from discoveries when no observation remains`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(LOG)
+
+        tracker.undoLast()
+
+        assertEquals(setOf(FIREBALL), tracker.discoveredCards())
+        assertNull(tracker.cardsPlayedSince(LOG))
+        assertNull(tracker.cardsUntilAvailable(LOG))
+    }
+
+    @Test
+    fun `undoing a repeated card restores its previous observation`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+        tracker.observe(FIREBALL)
+
+        assertEquals(FIREBALL, tracker.undoLast())
+
+        assertEquals(setOf(FIREBALL, KNIGHT), tracker.discoveredCards())
+        assertEquals(1, tracker.cardsPlayedSince(FIREBALL))
+        assertEquals(3, tracker.cardsUntilAvailable(FIREBALL))
+    }
+
+    @Test
+    fun `consecutive undo operations walk backward through observations`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+        tracker.observe(LOG)
+
+        assertEquals(LOG, tracker.undoLast())
+        assertEquals(KNIGHT, tracker.undoLast())
+
+        assertEquals(1, tracker.observationCount())
+        assertEquals(setOf(FIREBALL), tracker.discoveredCards())
+        assertEquals(0, tracker.cardsPlayedSince(FIREBALL))
+    }
+
+    @Test
+    fun `undo can return the tracker to an empty state`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+
+        tracker.undoLast()
+        tracker.undoLast()
+
+        assertEquals(0, tracker.observationCount())
+        assertTrue(tracker.discoveredCards().isEmpty())
+        assertNull(tracker.cardsPlayedSince(FIREBALL))
+        assertNull(tracker.cardsUntilAvailable(FIREBALL))
+        assertNull(tracker.undoLast())
+    }
+
+    @Test
+    fun `observing after undo continues from the restored state`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+        tracker.observe(LOG)
+        tracker.undoLast()
+
+        tracker.observe(SKELETONS)
+
+        assertEquals(3, tracker.observationCount())
+        assertEquals(setOf(FIREBALL, KNIGHT, SKELETONS), tracker.discoveredCards())
+        assertEquals(2, tracker.cardsPlayedSince(FIREBALL))
+        assertEquals(2, tracker.cardsUntilAvailable(FIREBALL))
+        assertNull(tracker.cardsPlayedSince(LOG))
+    }
+
+    @Test
+    fun `reset clears undo history`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+
+        tracker.reset()
+
+        assertNull(tracker.undoLast())
+        assertEquals(0, tracker.observationCount())
+    }
+
     private companion object {
         val HOG = CardId("Hog")
         val LOG = CardId("Log")

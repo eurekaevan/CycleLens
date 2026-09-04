@@ -3,20 +3,26 @@ package cyclelens.core
 class CycleTracker(
     private val rules: CycleRules = StandardCycleRules,
 ) {
-    private val lastObservedAt = mutableMapOf<CardId, Int>()
-    private var observationCount = 0
+    private val observationHistory = mutableListOf<CardId>()
 
     fun observe(card: CardId) {
-        observationCount += 1
-        lastObservedAt[card] = observationCount
+        observationHistory.add(card)
     }
 
-    fun discoveredCards(): Set<CardId> = lastObservedAt.keys.toSet()
+    fun undoLast(): CardId? = observationHistory.removeLastOrNull()
 
-    fun cardsPlayedSince(card: CardId): Int? =
-        lastObservedAt[card]?.let { lastObservation ->
-            observationCount - lastObservation
+    fun observationCount(): Int = observationHistory.size
+
+    fun discoveredCards(): Set<CardId> = observationHistory.toSet()
+
+    fun cardsPlayedSince(card: CardId): Int? {
+        val lastObservationIndex = observationHistory.lastIndexOf(card)
+        return if (lastObservationIndex < 0) {
+            null
+        } else {
+            observationHistory.lastIndex - lastObservationIndex
         }
+    }
 
     fun cardsUntilAvailable(card: CardId): Int? =
         cardsPlayedSince(card)?.let { cardsPlayed ->
@@ -24,7 +30,6 @@ class CycleTracker(
         }
 
     fun reset() {
-        lastObservedAt.clear()
-        observationCount = 0
+        observationHistory.clear()
     }
 }
