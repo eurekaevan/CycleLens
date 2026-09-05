@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import com.eureka.cyclelens.overlay.OverlayService
 import com.eureka.cyclelens.capture.CaptureService
+import com.eureka.cyclelens.capture.CaptureProfile
 import com.eureka.cyclelens.ui.CycleLensTheme
 import com.eureka.cyclelens.ui.CycleTrackerRoute
 
@@ -42,7 +43,12 @@ class MainActivity : ComponentActivity() {
             return@registerForActivityResult
         }
         try {
-            CaptureService.start(this, result.resultCode, resultData)
+            CaptureService.start(
+                this,
+                result.resultCode,
+                resultData,
+                cycleLensApplication.captureConfiguration.profile.value,
+            )
         } catch (error: RuntimeException) {
             Log.e(TAG, "Unable to start capture service", error)
             captureState.fail("Screen capture service could not start")
@@ -63,11 +69,16 @@ class MainActivity : ComponentActivity() {
                     overlayQuickCards = cycleLensApplication.overlayQuickCards,
                     overlayConfiguration = cycleLensApplication.overlayConfiguration,
                     captureState = cycleLensApplication.captureSessionState.state,
+                    captureProfile = cycleLensApplication.captureConfiguration.profile,
+                    debugSnapshotState = cycleLensApplication.captureDebugSnapshot.state,
                     overlayPermissionGranted = overlayPermissionGranted,
                     onEnableOverlayClick = ::openOverlayPermissionSettings,
                     onStartOverlayClick = ::startOverlay,
                     onStartCaptureClick = ::startCapture,
                     onStopCaptureClick = ::stopCapture,
+                    onCaptureProfileChanged = ::setCaptureProfile,
+                    onSaveDebugFrameClick = ::saveDebugFrame,
+                    onDeleteDebugFrameClick = ::deleteDebugFrame,
                 )
             }
         }
@@ -129,6 +140,25 @@ class MainActivity : ComponentActivity() {
 
     private fun stopCapture() {
         CaptureService.stop(this)
+    }
+
+    private fun setCaptureProfile(profile: CaptureProfile) {
+        cycleLensApplication.captureConfiguration.setProfile(
+            profile,
+            cycleLensApplication.captureSessionState.state.value,
+        )
+    }
+
+    private fun saveDebugFrame() {
+        if (BuildConfig.DEBUG) {
+            CaptureService.saveDebugFrame(this)
+        }
+    }
+
+    private fun deleteDebugFrame() {
+        if (BuildConfig.DEBUG) {
+            cycleLensApplication.captureDebugSnapshot.delete()
+        }
     }
 
     private val cycleLensApplication: CycleLensApplication

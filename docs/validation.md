@@ -4,9 +4,9 @@
 
 ## 自动验证基线
 
-当前测试总数为 134：
+当前测试总数为 160：
 
-- 120 个 Kotlin/JVM 测试（`cycle-core` + Android app 的 JVM 可测状态/映射逻辑）；
+- 146 个 Kotlin/JVM 测试（`cycle-core` + Android app 的 JVM 可测状态/映射逻辑）；
 - 14 个 Python Catalog updater 测试。
 
 完整验收命令：
@@ -20,7 +20,7 @@
 git diff --check
 ```
 
-最近一次 Stage 6B 完整验收中，上述命令全部成功，Debug APK 为 31,404,040 bytes。WindowManager 本身和 MediaProjection 实际系统行为没有用 JVM mock 作为替代，而是在真机上验收。
+最近一次 Stage 6C 完整验收中，上述命令全部成功。WindowManager、MediaProjection 输出缩放和截图像素没有用 JVM mock 作为替代，而是在真机上验收。
 
 ## Samsung Android 16 真机基线
 
@@ -40,6 +40,36 @@ git diff --check
 | 旋转/尺寸变化 | 通过 | 1440×3120 → 3120×1440 → 1440×3120 |
 | FGS / Window / lifecycle 异常 | 未观察到 | 该轮测试 logcat 无 FGS 类型、WindowLeaked 或 lifecycle crash |
 
+## Stage 6C profile benchmark
+
+设备为同一台 Samsung SM-S9260 / Android 16。各 profile 在 Clash Royale 前台连续采样约 2 分钟；CPU 是 `top` 的波动区间/典型值，PSS 是该轮结束点样本，不是硬断言。三轮在同一 app process 中顺序执行，因此 PSS 会包含前一轮的已提交堆页。
+
+| Profile | Source → output | Incoming | Accepted | App CPU | End PSS | Thermal |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Native | 1440×3120 → 1440×3120 | 117.9–119.0 FPS | 29.9–30.0 FPS | 约 51%（47.8–52.2%） | 96,305 KB | status 0 |
+| Balanced | 1440×3120 → 720×1560 | 117.9–118.9 FPS | 15.0 FPS | 约 15%（14.6–15.4%） | 97,901 KB | status 0 |
+| Eco | 1440×3120 → 540×1170 | 117.9–119.0 FPS | 10.0 FPS | 约 12.8%（多数 12.6–13.2%） | 98,614 KB | status 0 |
+
+`Surface.setFrameRate(30)` 调用未抛异常，但三档动态游戏画面的 incoming 都仍接近 120 FPS，因此该 hint 对此 MediaProjection 路径无效。Balanced 的 output 降采样把 app CPU 从约 51% 降至约 15%；sampling gate 与 capture resolution 是独立优化轴。
+
+三轮 thermal status 均为 0，app PID 没有出现 acquire/maxImages、BufferQueue abandoned、FGS、ImageReader leak 或 crash。系统 SystemUI PID 在投屏建立/切换点曾输出 `ImageReader_JNI maxImages` warning，未出现在 CycleLens PID 且没有持续增长或 callback backlog。实战期间未观察到明显停顿，但没有进行 SurfaceFlinger 级游戏 frame-pacing 测量；一次游戏网络“连接中断”弹窗不属于 Capture crash。
+
+## Snapshot 与 arena calibration
+
+| 场景 | 直接 PNG 结果 |
+| --- | --- |
+| Single-app + Overlay | Overlay 不在像素中；无 letterbox、无 unexpected crop |
+| Entire-display + Overlay | Overlay 明确在像素中 |
+| Entire-display system UI | Clash Royale 为 immersive fullscreen，该帧未显示 status bar 或 navigation UI；因此只能记录为“该测试帧中不存在”，不能推断系统永远排除它们 |
+
+Single-app 系统状态为 `RECORD_CONTENT_TASK`、`mIsRecordingOverlay=false`；entire-display 为 `RECORD_CONTENT_DISPLAY`。实战 single-app 720×1560 PNG 人工测得 arena normalized rect：
+
+```text
+left=0.000, top=0.095, right=1.000, bottom=0.855
+```
+
+对应 Balanced pixel rect 为 `(0, 148) .. (720, 1334)`。它只定义 arena，不定义卡牌、spell 或 deployment ROI。
+
 旋转测试早期曾观察到 BufferQueue abandoned，原因是切换 surface 后立即关闭旧 ImageReader。实现改为先取消 listener、再延迟 250 ms 释放旧 output。修复后双向 resize 没有再出现该错误。
 
 ## 资源观测
@@ -56,17 +86,14 @@ git diff --check
 
 ## 仍未完成的真机证明
 
-- 单 App 捕获时 Overlay 不进入像素：system state 的 `RECORD_CONTENT_TASK` 和 `mIsRecordingOverlay=false` 是强证据，但当前代码不查看/保存像素，所以没有直接图像证明。
-- “整个屏幕”授权模式已确认 system state 为 `RECORD_CONTENT_DISPLAY`，但 Overlay 是否出现在所得像素中未直接验证。
 - Android 系统投屏 chip 的 Stop 流程未单独人工验收；通知 Stop 和锁屏 stop 已验证。
-- 已在 Clash Royale lobby/前台内容上验证帧获取，但还没有完成长时实战的主观流畅度、发热和耗电验收。
+- Stage 6C profile 数值来自约 2 分钟/档的前台动态画面与一段实战，不等同于多局连续耗电或 SurfaceFlinger frame-pacing 验收。
 - 没有 OCR、CV、模型推理或自动 `observe()` 路径，因此不存在识别准确率验收结果。
 
 ## 下次真机验收清单
 
-1. 执行完整冷启动，确认手动记牌、Overlay 和 Capture 独立可用。
-2. 分别选择单 App 和整屏授权，记录 `dumpsys media_projection`。
-3. 在横竖屏间往返两次，检查尺寸恢复、frame count 继续增长且 logcat 没有 BufferQueue/IllegalStateException。
-4. 从 Capture 通知、系统投屏 chip 和锁屏分别停止，确认最终都返回 Idle 并清理 service。
-5. 进行至少一局完整对战，记录温度、电量、CPU/PSS 和 Overlay 触控感受。
-6. 只有在未来引入受控的像素验证工具后，才将 Overlay 是否出现在捕获内容中从 system-state 推断升级为直接证明。
+1. 用独立冷进程重测三档 PSS，消除本轮顺序执行与 debug Bitmap 已提交堆页的影响。
+2. 在横竖屏间往返两次，确认 Balanced/Eco resize 后仍保持 profile-derived output。
+3. 从 Android 系统投屏 chip 停止，确认最终返回 Idle 并清理 service。
+4. 进行多局连续实战，并用 SurfaceFlinger/frame timeline 工具补充主观流畅度证据。
+5. 若 Stage 6D 需要像素 buffer，先单独设计 ownership、背压和内存上限；不得传递 callback-owned `Image`。

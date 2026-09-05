@@ -77,16 +77,25 @@ class CaptureStateReducerTest {
 
     private companion object {
         val EMPTY_STATS = CaptureStats(
+            profile = CaptureProfile.NATIVE,
+            sourceWidth = 1440,
+            sourceHeight = 3120,
             width = 1440,
             height = 3120,
             receivedFrames = 0,
-            currentFps = 0f,
-            averageFps = 0f,
+            acceptedFrames = 0,
+            droppedFrames = 0,
+            incomingFps = 0f,
+            acceptedFps = 0f,
+            averageIncomingFps = 0f,
+            averageAcceptedFps = 0f,
             lastFrameTimestampNs = null,
             planeCount = null,
             pixelStride = null,
             rowStride = null,
             capturedContentVisible = true,
+            surfaceFrameRateHintRequested = true,
+            surfaceFrameRateHintApplied = true,
         )
     }
 }

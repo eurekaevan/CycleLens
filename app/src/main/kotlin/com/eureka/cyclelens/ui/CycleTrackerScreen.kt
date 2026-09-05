@@ -61,6 +61,9 @@ import com.eureka.cyclelens.TrackerUiState
 import com.eureka.cyclelens.catalog.CardArtworkRepository
 import com.eureka.cyclelens.catalog.CardCatalog
 import com.eureka.cyclelens.capture.CaptureState
+import com.eureka.cyclelens.capture.CaptureProfile
+import com.eureka.cyclelens.capture.DebugSnapshotState
+import com.eureka.cyclelens.BuildConfig
 import com.eureka.cyclelens.overlay.OverlayBackgroundOpacity
 import com.eureka.cyclelens.overlay.OverlayConfiguration
 import com.eureka.cyclelens.overlay.OverlayDetailMode
@@ -80,11 +83,16 @@ fun CycleTrackerRoute(
     overlayQuickCards: OverlayQuickCards,
     overlayConfiguration: OverlayConfiguration,
     captureState: StateFlow<CaptureState>,
+    captureProfile: StateFlow<CaptureProfile>,
+    debugSnapshotState: StateFlow<DebugSnapshotState>,
     overlayPermissionGranted: Boolean,
     onEnableOverlayClick: () -> Unit,
     onStartOverlayClick: () -> Unit,
     onStartCaptureClick: () -> Unit,
     onStopCaptureClick: () -> Unit,
+    onCaptureProfileChanged: (CaptureProfile) -> Unit,
+    onSaveDebugFrameClick: () -> Unit,
+    onDeleteDebugFrameClick: () -> Unit,
     trackerViewModel: CycleTrackerViewModel = viewModel(
         factory = CycleTrackerViewModel.Factory(
             matchSession = matchSession,
@@ -96,11 +104,15 @@ fun CycleTrackerRoute(
 ) {
     val state by trackerViewModel.uiState.collectAsStateWithLifecycle()
     val currentCaptureState by captureState.collectAsStateWithLifecycle()
+    val currentCaptureProfile by captureProfile.collectAsStateWithLifecycle()
+    val currentDebugSnapshotState by debugSnapshotState.collectAsStateWithLifecycle()
 
     CycleTrackerScreen(
         state = state,
         artworkRepository = artworkRepository,
         captureState = currentCaptureState,
+        captureProfile = currentCaptureProfile,
+        debugSnapshotState = currentDebugSnapshotState,
         onTrackedCardClick = trackerViewModel::observeTrackedCard,
         onAddCardClick = trackerViewModel::openCardPicker,
         onPickerDismiss = trackerViewModel::dismissCardPicker,
@@ -122,6 +134,9 @@ fun CycleTrackerRoute(
         onStartOverlayClick = onStartOverlayClick,
         onStartCaptureClick = onStartCaptureClick,
         onStopCaptureClick = onStopCaptureClick,
+        onCaptureProfileChanged = onCaptureProfileChanged,
+        onSaveDebugFrameClick = onSaveDebugFrameClick,
+        onDeleteDebugFrameClick = onDeleteDebugFrameClick,
     )
 }
 
@@ -130,6 +145,8 @@ fun CycleTrackerScreen(
     state: TrackerUiState,
     artworkRepository: CardArtworkRepository,
     captureState: CaptureState,
+    captureProfile: CaptureProfile,
+    debugSnapshotState: DebugSnapshotState,
     onTrackedCardClick: (CardId) -> Unit,
     onAddCardClick: () -> Unit,
     onPickerDismiss: () -> Unit,
@@ -151,6 +168,9 @@ fun CycleTrackerScreen(
     onStartOverlayClick: () -> Unit,
     onStartCaptureClick: () -> Unit,
     onStopCaptureClick: () -> Unit,
+    onCaptureProfileChanged: (CaptureProfile) -> Unit,
+    onSaveDebugFrameClick: () -> Unit,
+    onDeleteDebugFrameClick: () -> Unit,
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -181,8 +201,13 @@ fun CycleTrackerScreen(
 
             CaptureControl(
                 state = captureState,
+                profile = captureProfile,
+                debugSnapshotState = debugSnapshotState,
                 onStartClick = onStartCaptureClick,
                 onStopClick = onStopCaptureClick,
+                onProfileChanged = onCaptureProfileChanged,
+                onSaveDebugFrameClick = onSaveDebugFrameClick,
+                onDeleteDebugFrameClick = onDeleteDebugFrameClick,
             )
 
             OverlayQuickCardsControl(
@@ -282,8 +307,13 @@ fun CycleTrackerScreen(
 @Composable
 private fun CaptureControl(
     state: CaptureState,
+    profile: CaptureProfile,
+    debugSnapshotState: DebugSnapshotState,
     onStartClick: () -> Unit,
     onStopClick: () -> Unit,
+    onProfileChanged: (CaptureProfile) -> Unit,
+    onSaveDebugFrameClick: () -> Unit,
+    onDeleteDebugFrameClick: () -> Unit,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -299,6 +329,30 @@ private fun CaptureControl(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
+            Text(
+                text = stringResource(R.string.capture_profile),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CaptureProfile.entries.forEach { option ->
+                    FilterChip(
+                        selected = profile == option,
+                        enabled = state == CaptureState.Idle || state is CaptureState.Error,
+                        onClick = { onProfileChanged(option) },
+                        label = {
+                            Text(
+                                stringResource(
+                                    when (option) {
+                                        CaptureProfile.NATIVE -> R.string.capture_profile_native
+                                        CaptureProfile.BALANCED -> R.string.capture_profile_balanced
+                                        CaptureProfile.ECO -> R.string.capture_profile_eco
+                                    },
+                                ),
+                            )
+                        },
+                    )
+                }
+            }
             Text(
                 text = stringResource(
                     when (state) {
@@ -345,6 +399,37 @@ private fun CaptureControl(
                     ),
                 )
             }
+
+            if (BuildConfig.DEBUG) {
+                OutlinedButton(
+                    onClick = onSaveDebugFrameClick,
+                    enabled = state is CaptureState.Running && !debugSnapshotState.pending,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                ) {
+                    Text(
+                        stringResource(
+                            if (debugSnapshotState.pending) {
+                                R.string.debug_snapshot_pending
+                            } else {
+                                R.string.save_debug_frame
+                            },
+                        ),
+                    )
+                }
+                debugSnapshotState.cachePath?.let { path ->
+                    Text(
+                        text = stringResource(R.string.debug_snapshot_path, path),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    TextButton(onClick = onDeleteDebugFrameClick) {
+                        Text(stringResource(R.string.delete_debug_frame))
+                    }
+                }
+                debugSnapshotState.error?.let { message ->
+                    Text(message, color = MaterialTheme.colorScheme.error)
+                }
+            }
         }
     }
 }
@@ -354,17 +439,34 @@ private fun CaptureStatsContent(state: CaptureState.Running) {
     val stats = state.stats
     val unknown = stringResource(R.string.capture_value_unknown)
     Text(
-        text = stringResource(R.string.capture_source_size, stats.width, stats.height),
+        text = stringResource(
+            R.string.capture_source_output_size,
+            stats.sourceWidth,
+            stats.sourceHeight,
+            stats.width,
+            stats.height,
+        ),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Text(
-        text = stringResource(R.string.capture_fps, stats.currentFps, stats.averageFps),
+        text = stringResource(
+            R.string.capture_fps,
+            stats.incomingFps,
+            stats.acceptedFps,
+            stats.averageIncomingFps,
+            stats.averageAcceptedFps,
+        ),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Text(
-        text = stringResource(R.string.capture_frames, stats.receivedFrames),
+        text = stringResource(
+            R.string.capture_frames,
+            stats.receivedFrames,
+            stats.acceptedFrames,
+            stats.droppedFrames,
+        ),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -384,6 +486,16 @@ private fun CaptureStatsContent(state: CaptureState.Running) {
             stats.planeCount?.toString() ?: unknown,
             stats.pixelStride?.toString() ?: unknown,
             stats.rowStride?.toString() ?: unknown,
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(
+            R.string.capture_frame_rate_hint,
+            stringResource(
+                if (stats.surfaceFrameRateHintApplied) R.string.capture_yes else R.string.capture_no,
+            ),
         ),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,

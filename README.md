@@ -2,7 +2,7 @@
 
 CycleLens 是一个本地优先的 Android 皇室战争手动牌序辅助工具。玩家点击对手刚打出的卡牌，应用会记录首次发现顺序，并显示关键牌距离再次可用还差几张。
 
-> 当前是开发阶段。Screen Capture 只完成了 MediaProjection 帧获取和性能诊断边界，**没有卡牌识别，也不会自动记牌**。
+> 当前是开发阶段。Screen Capture 已完成 profile、采样、坐标映射和 debug-only 单帧校准边界，**没有卡牌识别，也不会自动记牌**。
 
 ## 已实现
 
@@ -11,7 +11,9 @@ CycleLens 是一个本地优先的 Android 皇室战争手动牌序辅助工具�
 - 手动实战 Overlay：4×2 稳定卡槽、点击记牌、Undo、新卡 Picker、拖动和折叠。
 - Overlay 可调整尺寸、详细度和背景不透明度；默认是 `COMFORTABLE + MINIMAL + 50%`。
 - 离线 Canonical Card Catalog：126 个规范卡牌、122 张可记录卡牌、4 个 Tower Troop、184 个视觉形态和 126 张本地缩略图。
-- MediaProjection 帧入口：用户每次明确授权后，可观察尺寸、FPS、帧数和 stride 等元数据。当前不处理像素内容。
+- MediaProjection 帧入口：Native、Balanced、Eco 输出 profile，分别将 accepted analysis frame 限制为 30、15、10 FPS。
+- Capture geometry：区分 source/output 尺寸，并统一提供 source、output、normalized 坐标映射。
+- Debug build 可由用户主动保存一张 cache PNG；正式帧路径仍只产生 metadata/descriptor，不传递 Android `Image`。
 
 ## 快速开始
 
@@ -41,7 +43,8 @@ APK 输出位于 `app/build/outputs/apk/debug/app-debug.apk`。工程使用 Grad
 1. 在主界面从本地 Catalog 选择对手打出的卡牌。
 2. 卡牌首次出现后会固定在 Opponent Deck 的一个位置；之后直接点击该卡即可再次记录。
 3. 要在其他 App 上方操作，先授予“显示在其他应用上层”权限，再从可见 Activity 中点击 `START OVERLAY`。
-4. `START CAPTURE` 是开发诊断入口；Android 会在每个 session 开始前显示屏幕捕获授权页。
+4. Capture Idle 时选择 profile，再点击 `START CAPTURE`；Android 会在每个 session 开始前显示屏幕捕获授权页。
+5. Debug build 的 `SAVE DEBUG FRAME` 会武装一次性快照；切回目标 App 后只保存一帧到私有 cache，可在界面中删除。
 
 Overlay 和 Screen Capture 是两个独立的前台服务。停止任何一个都不会自动 Reset 本局牌序，也不会停止另一个服务。
 
@@ -54,7 +57,8 @@ OverlayService  ─┼─→ MatchSession ─→ cycle-core/CycleTracker
 Local Catalog  ──┘
 
 Activity ─→ CaptureSessionStateStore ← CaptureService
-                                      └─→ FrameMetadata only
+                                      ├─→ SamplingGate → AnalysisFrameDescriptor
+                                      └─→ debug-only one-shot cache PNG
 ```
 
 - `cycle-core/` 不依赖 Android，也不知道卡名、图标、Overlay 或屏幕捕获。
@@ -74,7 +78,7 @@ Android 运行时只读取打包在 App 内的 `app/src/main/assets/cards.json` 
 
 - 不使用 AccessibilityService、Root、Hook、游戏进程读取、网络抓包、自动点击或手势模拟。
 - 不做 OCR/CV/模型推理；`VisualDetection` 目前只是一个未接入的边界 DTO。
-- Screen Capture 使用 `ImageReader` 接收帧，但当前只读取帧元数据；不拷贝、保存或上传像素。
+- Screen Capture 平时只读取帧元数据；只有 Debug build、用户主动点击后才复制一帧到私有 cache，不连续保存、不公开到相册，也不上传。
 - 没有对局持久化。Android 终止 CycleLens process 后，当前 MatchSession 和 Capture 状态会丢失。
 - 当前的“可用”是标准四卡循环距离，不声称精确恢复对手实时四张手牌。
 

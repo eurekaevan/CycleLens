@@ -17,16 +17,25 @@ sealed interface CaptureState {
 }
 
 data class CaptureStats(
+    val profile: CaptureProfile,
+    val sourceWidth: Int,
+    val sourceHeight: Int,
     val width: Int,
     val height: Int,
     val receivedFrames: Long,
-    val currentFps: Float,
-    val averageFps: Float,
+    val acceptedFrames: Long,
+    val droppedFrames: Long,
+    val incomingFps: Float,
+    val acceptedFps: Float,
+    val averageIncomingFps: Float,
+    val averageAcceptedFps: Float,
     val lastFrameTimestampNs: Long?,
     val planeCount: Int?,
     val pixelStride: Int?,
     val rowStride: Int?,
     val capturedContentVisible: Boolean,
+    val surfaceFrameRateHintRequested: Boolean,
+    val surfaceFrameRateHintApplied: Boolean,
 )
 
 internal sealed interface CaptureEvent {

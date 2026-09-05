@@ -5,6 +5,8 @@ import com.eureka.cyclelens.catalog.AssetCardCatalogLoader
 import com.eureka.cyclelens.catalog.CardArtworkRepository
 import com.eureka.cyclelens.catalog.CardCatalog
 import com.eureka.cyclelens.capture.CaptureSessionStateStore
+import com.eureka.cyclelens.capture.CaptureConfiguration
+import com.eureka.cyclelens.capture.CaptureDebugSnapshotStore
 import com.eureka.cyclelens.overlay.OverlayConfiguration
 import com.eureka.cyclelens.overlay.OverlayQuickCards
 import com.eureka.cyclelens.session.MatchSession
@@ -12,6 +14,9 @@ import com.eureka.cyclelens.session.MatchSession
 class CycleLensApplication : Application() {
     val matchSession: MatchSession = MatchSession()
     val captureSessionState: CaptureSessionStateStore = CaptureSessionStateStore()
+    val captureConfiguration: CaptureConfiguration = CaptureConfiguration()
+    lateinit var captureDebugSnapshot: CaptureDebugSnapshotStore
+        private set
     lateinit var cardCatalog: CardCatalog
         private set
     lateinit var cardArtworkRepository: CardArtworkRepository
@@ -23,6 +28,7 @@ class CycleLensApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         cardCatalog = AssetCardCatalogLoader.load(this)
+        captureDebugSnapshot = CaptureDebugSnapshotStore.create(this).also { it.clearOnStartup() }
         cardArtworkRepository = CardArtworkRepository(assets, cardCatalog)
         overlayQuickCards = OverlayQuickCards(cardCatalog)
     }
