@@ -151,6 +151,34 @@ class CycleTrackerTest {
     }
 
     @Test
+    fun `discovered cards keep their first discovery order`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+        tracker.observe(FIREBALL)
+        tracker.observe(LOG)
+        tracker.observe(KNIGHT)
+
+        assertEquals(
+            listOf(FIREBALL, KNIGHT, LOG),
+            tracker.discoveredCardsInOrder(),
+        )
+    }
+
+    @Test
+    fun `ordered discoveries are returned as a snapshot`() {
+        val tracker = CycleTracker()
+        tracker.observe(FIREBALL)
+        tracker.observe(KNIGHT)
+
+        val discoveriesBeforeNextObservation = tracker.discoveredCardsInOrder()
+        tracker.observe(LOG)
+
+        assertEquals(listOf(FIREBALL, KNIGHT), discoveriesBeforeNextObservation)
+        assertEquals(listOf(FIREBALL, KNIGHT, LOG), tracker.discoveredCardsInOrder())
+    }
+
+    @Test
     fun `undo on an empty history returns null`() {
         val tracker = CycleTracker()
 

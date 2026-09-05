@@ -1,14 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CycleLens</string>
-    <string name="card_id">Card ID</string>
-    <string name="observe">OBSERVE</string>
-    <string name="observations">Observations: %1$d</string>
-    <string name="discovered_cards">Discovered cards: %1$d</string>
-    <string name="no_cards_observed">No cards observed yet.</string>
-    <string name="played_since">Played since: %1$d</string>
-    <string name="until_available">Until available: %1$d</string>
-    <string name="until_available_now">Until available: AVAILABLE</string>
+    <string name="opponent_deck">Opponent Deck</string>
+    <string name="deck_count">%1$d / %2$d</string>
+    <string name="empty_deck">Add each card when your opponent reveals it. After that, tap it here to record every play.</string>
+    <string name="add_card">+ ADD CARD</string>
+    <string name="deck_full">DECK FULL</string>
+    <string name="available">AVAILABLE</string>
+    <string name="add_observed_card">Add observed card</string>
+    <string name="add_card_help">Choose a card the first time it appears.</string>
+    <string name="search_cards">Search cards</string>
+    <string name="no_matching_cards">No matching cards</string>
     <string name="undo">UNDO</string>
     <string name="reset">RESET</string>
+    <string name="reset_match_title">Reset current match?</string>
+    <string name="reset_match_message">This clears the opponent deck and every recorded play.</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm_reset">Reset</string>
+    <string name="manual_overlay">Manual match overlay</string>
+    <string name="overlay_permission_required">Allow display over other apps before starting.</string>
+    <string name="overlay_permission_ready">Permission granted. Start it before switching apps.</string>
+    <string name="enable_overlay">ENABLE OVERLAY</string>
+    <string name="start_overlay">START OVERLAY</string>
+    <string name="overlay_notification_channel">CycleLens overlay</string>
+    <string name="overlay_notification_title">CycleLens</string>
+    <string name="overlay_notification_text">Match overlay is active</string>
+    <string name="stop_overlay">STOP</string>
+    <string name="overlay_drag_title">≡ CL</string>
+    <string name="overlay_picker_title">≡ Add</string>
+    <string name="overlay_empty_deck">Tap + to add a card</string>
+    <string name="overlay_drag">Drag CycleLens overlay</string>
+    <string name="overlay_collapse">Collapse overlay</string>
+    <string name="overlay_expand">Expand CycleLens overlay</string>
+    <string name="overlay_add">+ ADD</string>
+    <string name="overlay_close_picker">Close card picker</string>
+    <string name="overlay_undo">↶ UNDO</string>
+    <string name="overlay_card_description">%1$s, %2$s</string>
+    <string name="overlay_add_card_description">Add card: %1$s</string>
+    <string name="overlay_size">Overlay size</string>
+    <string name="overlay_size_compact">Compact</string>
+    <string name="overlay_size_comfortable">Comfortable</string>
+    <string name="overlay_detail">Display detail</string>
+    <string name="overlay_detail_full">Full</string>
+    <string name="overlay_detail_minimal">Minimal</string>
+    <string name="overlay_background">Background opacity</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="overlay_quick_cards">Overlay Quick Cards</string>
+    <string name="quick_cards_count">Quick cards: %1$d / %2$d</string>
+    <string name="configure">CONFIGURE</string>
+    <string name="configure_quick_cards">Configure quick cards</string>
+    <string name="quick_cards_help">These cards appear in the Overlay + picker. They are not the opponent deck.</string>
+    <string name="quick_selected_indicator">✓</string>
+    <string name="quick_add_indicator">+</string>
+    <string name="fan_content_disclaimer">This material is unofficial and is not endorsed by Supercell. For more information, see Supercell\'s Fan Content Policy.</string>
+    <string name="fan_content_policy">Supercell Fan Content Policy</string>
+
+    <plurals name="plays_recorded">
+        <item quantity="one">%1$d play recorded</item>
+        <item quantity="other">%1$d plays recorded</item>
+    </plurals>
+    <plurals name="cards_played_since">
+        <item quantity="one">%1$d played</item>
+        <item quantity="other">%1$d played</item>
+    </plurals>
+    <plurals name="cards_away">
+        <item quantity="one">%1$d away</item>
+        <item quantity="other">%1$d away</item>
+    </plurals>
 </resources>

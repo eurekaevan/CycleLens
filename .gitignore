@@ -2,3 +2,7 @@
 .idea/
 **/build/
 local.properties
+*.hprof
+java_pid*.hprof
+__pycache__/
+*.pyc

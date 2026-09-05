@@ -1,59 +1,144 @@
 package com.eureka.cyclelens.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.eureka.cyclelens.CardUiState
+import com.eureka.cyclelens.CardPickerItemUiState
 import com.eureka.cyclelens.CycleTrackerViewModel
+import com.eureka.cyclelens.QuickCardOptionUiState
 import com.eureka.cyclelens.R
+import com.eureka.cyclelens.TrackedCardUiState
 import com.eureka.cyclelens.TrackerUiState
+import com.eureka.cyclelens.catalog.CardArtworkRepository
+import com.eureka.cyclelens.catalog.CardCatalog
+import com.eureka.cyclelens.overlay.OverlayBackgroundOpacity
+import com.eureka.cyclelens.overlay.OverlayConfiguration
+import com.eureka.cyclelens.overlay.OverlayDetailMode
+import com.eureka.cyclelens.overlay.OverlayQuickCards
+import com.eureka.cyclelens.overlay.OverlaySizeMode
+import com.eureka.cyclelens.session.MatchSession
+import cyclelens.core.CardId
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CycleTrackerRoute(
-    trackerViewModel: CycleTrackerViewModel = viewModel(),
+    matchSession: MatchSession,
+    catalog: CardCatalog,
+    artworkRepository: CardArtworkRepository,
+    overlayQuickCards: OverlayQuickCards,
+    overlayConfiguration: OverlayConfiguration,
+    overlayPermissionGranted: Boolean,
+    onEnableOverlayClick: () -> Unit,
+    onStartOverlayClick: () -> Unit,
+    trackerViewModel: CycleTrackerViewModel = viewModel(
+        factory = CycleTrackerViewModel.Factory(
+            matchSession = matchSession,
+            catalog = catalog,
+            overlayQuickCards = overlayQuickCards,
+            overlayConfiguration = overlayConfiguration,
+        ),
+    ),
 ) {
     val state by trackerViewModel.uiState.collectAsStateWithLifecycle()
 
     CycleTrackerScreen(
         state = state,
-        onInputChanged = trackerViewModel::onInputChanged,
-        onObserve = trackerViewModel::observeInput,
-        onUndo = trackerViewModel::undo,
-        onReset = trackerViewModel::reset,
+        artworkRepository = artworkRepository,
+        onTrackedCardClick = trackerViewModel::observeTrackedCard,
+        onAddCardClick = trackerViewModel::openCardPicker,
+        onPickerDismiss = trackerViewModel::dismissCardPicker,
+        onSearchQueryChanged = trackerViewModel::onSearchQueryChanged,
+        onNewCardClick = trackerViewModel::selectNewCard,
+        onQuickCardEditorClick = trackerViewModel::openQuickCardEditor,
+        onQuickCardEditorDismiss = trackerViewModel::dismissQuickCardEditor,
+        onQuickCardSearchQueryChanged = trackerViewModel::onQuickCardSearchQueryChanged,
+        onQuickCardToggle = trackerViewModel::toggleQuickCard,
+        onOverlaySizeModeChanged = trackerViewModel::setOverlaySizeMode,
+        onOverlayDetailModeChanged = trackerViewModel::setOverlayDetailMode,
+        onOverlayBackgroundOpacityChanged = trackerViewModel::setOverlayBackgroundOpacity,
+        onUndoClick = trackerViewModel::undo,
+        onResetClick = trackerViewModel::requestReset,
+        onResetDismiss = trackerViewModel::dismissResetConfirmation,
+        onResetConfirm = trackerViewModel::confirmReset,
+        overlayPermissionGranted = overlayPermissionGranted,
+        onEnableOverlayClick = onEnableOverlayClick,
+        onStartOverlayClick = onStartOverlayClick,
     )
 }
 
 @Composable
 fun CycleTrackerScreen(
     state: TrackerUiState,
-    onInputChanged: (String) -> Unit,
-    onObserve: () -> Unit,
-    onUndo: () -> Unit,
-    onReset: () -> Unit,
+    artworkRepository: CardArtworkRepository,
+    onTrackedCardClick: (CardId) -> Unit,
+    onAddCardClick: () -> Unit,
+    onPickerDismiss: () -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
+    onNewCardClick: (CardId) -> Unit,
+    onQuickCardEditorClick: () -> Unit,
+    onQuickCardEditorDismiss: () -> Unit,
+    onQuickCardSearchQueryChanged: (String) -> Unit,
+    onQuickCardToggle: (CardId) -> Unit,
+    onOverlaySizeModeChanged: (OverlaySizeMode) -> Unit,
+    onOverlayDetailModeChanged: (OverlayDetailMode) -> Unit,
+    onOverlayBackgroundOpacityChanged: (OverlayBackgroundOpacity) -> Unit,
+    onUndoClick: () -> Unit,
+    onResetClick: () -> Unit,
+    onResetDismiss: () -> Unit,
+    onResetConfirm: () -> Unit,
+    overlayPermissionGranted: Boolean,
+    onEnableOverlayClick: () -> Unit,
+    onStartOverlayClick: () -> Unit,
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -61,7 +146,7 @@ fun CycleTrackerScreen(
                 .fillMaxSize()
                 .safeDrawingPadding()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(horizontal = 16.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
@@ -70,43 +155,50 @@ fun CycleTrackerScreen(
                 fontWeight = FontWeight.SemiBold,
             )
 
-            OutlinedTextField(
-                value = state.input,
-                onValueChange = onInputChanged,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.card_id)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { onObserve() }),
+            OverlayControl(
+                permissionGranted = overlayPermissionGranted,
+                sizeMode = state.overlaySizeMode,
+                detailMode = state.overlayDetailMode,
+                backgroundOpacity = state.overlayBackgroundOpacity,
+                onEnableClick = onEnableOverlayClick,
+                onStartClick = onStartOverlayClick,
+                onSizeModeChanged = onOverlaySizeModeChanged,
+                onDetailModeChanged = onOverlayDetailModeChanged,
+                onBackgroundOpacityChanged = onOverlayBackgroundOpacityChanged,
             )
 
-            Button(
-                onClick = onObserve,
-                enabled = state.input.isNotBlank(),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.observe))
+            OverlayQuickCardsControl(
+                selectedCount = state.quickCardCount,
+                limit = state.quickCardLimit,
+                onConfigureClick = onQuickCardEditorClick,
+            )
+
+            OpponentDeckHeader(state)
+
+            if (state.opponentDeck.isEmpty()) {
+                EmptyDeckMessage()
+            } else {
+                OpponentDeckGrid(
+                    cards = state.opponentDeck,
+                    artworkRepository = artworkRepository,
+                    onCardClick = onTrackedCardClick,
+                )
             }
 
-            Text(
-                text = stringResource(R.string.observations, state.observations),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = stringResource(R.string.discovered_cards, state.cards.size),
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            if (state.cards.isEmpty()) {
+            Button(
+                onClick = onAddCardClick,
+                enabled = state.canAddCard,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 52.dp),
+            ) {
                 Text(
-                    text = stringResource(R.string.no_cards_observed),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = if (state.canAddCard) {
+                        stringResource(R.string.add_card)
+                    } else {
+                        stringResource(R.string.deck_full)
+                    },
                 )
-            } else {
-                state.cards.forEach { card ->
-                    CardStatus(card)
-                    HorizontalDivider()
-                }
             }
 
             Row(
@@ -114,18 +206,182 @@ fun CycleTrackerScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 OutlinedButton(
-                    onClick = onUndo,
+                    onClick = onUndoClick,
                     enabled = state.canUndo,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 48.dp),
                 ) {
                     Text(stringResource(R.string.undo))
                 }
                 OutlinedButton(
-                    onClick = onReset,
-                    enabled = state.observations > 0 || state.input.isNotEmpty(),
-                    modifier = Modifier.weight(1f),
+                    onClick = onResetClick,
+                    enabled = state.canReset,
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 48.dp),
                 ) {
                     Text(stringResource(R.string.reset))
+                }
+            }
+
+            FanContentDisclaimer()
+        }
+    }
+
+    if (state.isCardPickerVisible) {
+        CardPickerSheet(
+            cards = state.pickerCards,
+            artworkRepository = artworkRepository,
+            searchQuery = state.searchQuery,
+            onSearchQueryChanged = onSearchQueryChanged,
+            onCardClick = onNewCardClick,
+            onDismiss = onPickerDismiss,
+        )
+    }
+
+    if (state.isQuickCardEditorVisible) {
+        QuickCardEditorSheet(
+            cards = state.quickCardOptions,
+            artworkRepository = artworkRepository,
+            selectedCount = state.quickCardCount,
+            limit = state.quickCardLimit,
+            searchQuery = state.quickCardSearchQuery,
+            onSearchQueryChanged = onQuickCardSearchQueryChanged,
+            onCardToggle = onQuickCardToggle,
+            onDismiss = onQuickCardEditorDismiss,
+        )
+    }
+
+    if (state.isResetConfirmationVisible) {
+        ResetConfirmationDialog(
+            onDismiss = onResetDismiss,
+            onConfirm = onResetConfirm,
+        )
+    }
+}
+
+@Composable
+private fun OverlayControl(
+    permissionGranted: Boolean,
+    sizeMode: OverlaySizeMode,
+    detailMode: OverlayDetailMode,
+    backgroundOpacity: OverlayBackgroundOpacity,
+    onEnableClick: () -> Unit,
+    onStartClick: () -> Unit,
+    onSizeModeChanged: (OverlaySizeMode) -> Unit,
+    onDetailModeChanged: (OverlayDetailMode) -> Unit,
+    onBackgroundOpacityChanged: (OverlayBackgroundOpacity) -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.manual_overlay),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = stringResource(
+                            if (permissionGranted) {
+                                R.string.overlay_permission_ready
+                            } else {
+                                R.string.overlay_permission_required
+                            },
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Button(
+                    onClick = if (permissionGranted) onStartClick else onEnableClick,
+                    modifier = Modifier.heightIn(min = 48.dp),
+                ) {
+                    Text(
+                        text = stringResource(
+                            if (permissionGranted) {
+                                R.string.start_overlay
+                            } else {
+                                R.string.enable_overlay
+                            },
+                        ),
+                    )
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.overlay_size),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OverlaySizeMode.entries.forEach { mode ->
+                    FilterChip(
+                        selected = sizeMode == mode,
+                        onClick = { onSizeModeChanged(mode) },
+                        label = {
+                            Text(
+                                stringResource(
+                                    if (mode == OverlaySizeMode.COMFORTABLE) {
+                                        R.string.overlay_size_comfortable
+                                    } else {
+                                        R.string.overlay_size_compact
+                                    },
+                                ),
+                            )
+                        },
+                    )
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.overlay_detail),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OverlayDetailMode.entries.forEach { mode ->
+                    FilterChip(
+                        selected = detailMode == mode,
+                        onClick = { onDetailModeChanged(mode) },
+                        label = {
+                            Text(
+                                stringResource(
+                                    if (mode == OverlayDetailMode.FULL) {
+                                        R.string.overlay_detail_full
+                                    } else {
+                                        R.string.overlay_detail_minimal
+                                    },
+                                ),
+                            )
+                        },
+                    )
+                }
+            }
+
+            Text(
+                text = stringResource(R.string.overlay_background),
+                style = MaterialTheme.typography.labelLarge,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OverlayBackgroundOpacity.entries.forEach { opacity ->
+                    FilterChip(
+                        selected = backgroundOpacity == opacity,
+                        onClick = { onBackgroundOpacityChanged(opacity) },
+                        label = { Text(stringResource(R.string.percent_value, opacity.percent)) },
+                    )
                 }
             }
         }
@@ -133,26 +389,535 @@ fun CycleTrackerScreen(
 }
 
 @Composable
-private fun CardStatus(card: CardUiState) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = card.cardId.value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium,
-        )
-        Text(stringResource(R.string.played_since, card.cardsPlayedSince))
-        Text(
-            text = if (card.available) {
-                stringResource(R.string.until_available_now)
+private fun OverlayQuickCardsControl(
+    selectedCount: Int,
+    limit: Int,
+    onConfigureClick: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.overlay_quick_cards),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = stringResource(R.string.quick_cards_count, selectedCount, limit),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            OutlinedButton(
+                onClick = onConfigureClick,
+                modifier = Modifier.heightIn(min = 48.dp),
+            ) {
+                Text(stringResource(R.string.configure))
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun QuickCardEditorSheet(
+    cards: List<QuickCardOptionUiState>,
+    artworkRepository: CardArtworkRepository,
+    selectedCount: Int,
+    limit: Int,
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
+    onCardToggle: (CardId) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.configure_quick_cards),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = stringResource(R.string.quick_cards_help),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = stringResource(R.string.quick_cards_count, selectedCount, limit),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChanged,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.search_cards)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(PICKER_COLUMN_COUNT),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentPadding = PaddingValues(bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(
+                    items = cards,
+                    key = { card -> card.cardId.value },
+                ) { card ->
+                    QuickCardOptionButton(
+                        card = card,
+                        artworkRepository = artworkRepository,
+                        onClick = { onCardToggle(card.cardId) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickCardOptionButton(
+    card: QuickCardOptionUiState,
+    artworkRepository: CardArtworkRepository,
+    onClick: () -> Unit,
+) {
+    FilledTonalButton(
+        onClick = onClick,
+        enabled = card.enabled,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 88.dp),
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = if (card.selected) {
+                MaterialTheme.colorScheme.primaryContainer
             } else {
-                stringResource(R.string.until_available, card.cardsUntilAvailable)
+                MaterialTheme.colorScheme.surfaceContainerHighest
             },
-            color = if (card.available) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurface
-            },
-            fontWeight = if (card.available) FontWeight.Bold else FontWeight.Normal,
+        ),
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            CardArtwork(
+                cardId = card.cardId,
+                displayName = card.displayName,
+                artworkRepository = artworkRepository,
+                size = 40.dp,
+            )
+            Text(
+                text = card.displayName,
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = stringResource(
+                    if (card.selected) {
+                        R.string.quick_selected_indicator
+                    } else {
+                        R.string.quick_add_indicator
+                    },
+                ),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
+@Composable
+private fun OpponentDeckHeader(state: TrackerUiState) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.opponent_deck),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = pluralStringResource(
+                    R.plurals.plays_recorded,
+                    state.observationCount,
+                    state.observationCount,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Text(
+            text = stringResource(
+                R.string.deck_count,
+                state.opponentDeck.size,
+                state.deckCapacity,
+            ),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
         )
     }
 }
+
+@Composable
+private fun EmptyDeckMessage() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Text(
+            text = stringResource(R.string.empty_deck),
+            modifier = Modifier.padding(24.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun OpponentDeckGrid(
+    cards: List<TrackedCardUiState>,
+    artworkRepository: CardArtworkRepository,
+    onCardClick: (CardId) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        cards.chunked(DECK_COLUMN_COUNT).forEach { rowCards ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                rowCards.forEach { card ->
+                    TrackedCardButton(
+                        card = card,
+                        artworkRepository = artworkRepository,
+                        onClick = { onCardClick(card.cardId) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                repeat(DECK_COLUMN_COUNT - rowCards.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrackedCardButton(
+    card: TrackedCardUiState,
+    artworkRepository: CardArtworkRepository,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val containerColor = if (card.available) {
+        MaterialTheme.colorScheme.tertiaryContainer
+    } else {
+        MaterialTheme.colorScheme.secondaryContainer
+    }
+    val contentColor = if (card.available) {
+        MaterialTheme.colorScheme.onTertiaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSecondaryContainer
+    }
+
+    FilledTonalButton(
+        onClick = onClick,
+        modifier = modifier.heightIn(min = 116.dp),
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        ),
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            CardArtwork(
+                cardId = card.cardId,
+                displayName = card.displayName,
+                artworkRepository = artworkRepository,
+                size = 48.dp,
+            )
+            Text(
+                text = card.displayName,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = pluralStringResource(
+                    R.plurals.cards_played_since,
+                    card.cardsPlayedSince,
+                    card.cardsPlayedSince,
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = if (card.available) {
+                    stringResource(R.string.available)
+                } else {
+                    pluralStringResource(
+                        R.plurals.cards_away,
+                        card.cardsUntilAvailable,
+                        card.cardsUntilAvailable,
+                    )
+                },
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CardPickerSheet(
+    cards: List<CardPickerItemUiState>,
+    artworkRepository: CardArtworkRepository,
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
+    onCardClick: (CardId) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.85f)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.add_observed_card),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = stringResource(R.string.add_card_help),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChanged,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.search_cards)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            )
+
+            if (cards.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = stringResource(R.string.no_matching_cards),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(PICKER_COLUMN_COUNT),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentPadding = PaddingValues(bottom = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(
+                        items = cards,
+                        key = { card -> card.cardId.value },
+                    ) { card ->
+                        PickerCardButton(
+                            card = card,
+                            artworkRepository = artworkRepository,
+                            onClick = { onCardClick(card.cardId) },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PickerCardButton(
+    card: CardPickerItemUiState,
+    artworkRepository: CardArtworkRepository,
+    onClick: () -> Unit,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 96.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            CardArtwork(
+                cardId = card.cardId,
+                displayName = card.displayName,
+                artworkRepository = artworkRepository,
+                size = 48.dp,
+            )
+            Text(
+                text = card.displayName,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CardArtwork(
+    cardId: CardId,
+    displayName: String,
+    artworkRepository: CardArtworkRepository,
+    size: androidx.compose.ui.unit.Dp,
+) {
+    val artwork by produceState<android.graphics.Bitmap?>(
+        initialValue = null,
+        cardId,
+        artworkRepository,
+    ) {
+        value = withContext(Dispatchers.IO) {
+            artworkRepository.bitmap(cardId)
+        }
+    }
+    Box(
+        modifier = Modifier.size(size),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (artwork == null) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = displayName.fallbackLabel(),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        } else {
+            Image(
+                bitmap = checkNotNull(artwork).asImageBitmap(),
+                contentDescription = displayName,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FanContentDisclaimer() {
+    val uriHandler = LocalUriHandler.current
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.fan_content_disclaimer),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        TextButton(onClick = { uriHandler.openUri(FAN_CONTENT_POLICY_URL) }) {
+            Text(stringResource(R.string.fan_content_policy))
+        }
+    }
+}
+
+private fun String.fallbackLabel(): String {
+    val initials = trim()
+        .split(Regex("\\s+"))
+        .filter(String::isNotEmpty)
+        .mapNotNull(String::firstOrNull)
+        .joinToString("")
+    return initials.take(2).uppercase().ifEmpty { "?" }
+}
+
+@Composable
+private fun ResetConfirmationDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.reset_match_title)) },
+        text = { Text(stringResource(R.string.reset_match_message)) },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                ),
+            ) {
+                Text(stringResource(R.string.confirm_reset))
+            }
+        },
+    )
+}
+
+private const val DECK_COLUMN_COUNT = 4
+private const val PICKER_COLUMN_COUNT = 4
+private const val FAN_CONTENT_POLICY_URL = "https://supercell.com/en/fan-content-policy/"

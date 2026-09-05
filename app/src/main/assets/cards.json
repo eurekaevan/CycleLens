@@ -1,0 +1,2370 @@
+{
+  "cards": [
+    {
+      "id": "knight",
+      "supercellId": 26000000,
+      "displayName": "Knight",
+      "shortName": "Knight",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000000.png"
+    },
+    {
+      "id": "archers",
+      "supercellId": 26000001,
+      "displayName": "Archers",
+      "shortName": "Archers",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000001.png"
+    },
+    {
+      "id": "goblins",
+      "supercellId": 26000002,
+      "displayName": "Goblins",
+      "shortName": "Goblins",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000002.png"
+    },
+    {
+      "id": "giant",
+      "supercellId": 26000003,
+      "displayName": "Giant",
+      "shortName": "Giant",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000003.png"
+    },
+    {
+      "id": "pekka",
+      "supercellId": 26000004,
+      "displayName": "P.E.K.K.A",
+      "shortName": "P.E.K.K.A",
+      "type": "TROOP",
+      "elixir": 7,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000004.png"
+    },
+    {
+      "id": "minions",
+      "supercellId": 26000005,
+      "displayName": "Minions",
+      "shortName": "Minions",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000005.png"
+    },
+    {
+      "id": "balloon",
+      "supercellId": 26000006,
+      "displayName": "Balloon",
+      "shortName": "Balloon",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000006.png"
+    },
+    {
+      "id": "witch",
+      "supercellId": 26000007,
+      "displayName": "Witch",
+      "shortName": "Witch",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000007.png"
+    },
+    {
+      "id": "barbarians",
+      "supercellId": 26000008,
+      "displayName": "Barbarians",
+      "shortName": "Barbarians",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000008.png"
+    },
+    {
+      "id": "golem",
+      "supercellId": 26000009,
+      "displayName": "Golem",
+      "shortName": "Golem",
+      "type": "TROOP",
+      "elixir": 8,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000009.png"
+    },
+    {
+      "id": "skeletons",
+      "supercellId": 26000010,
+      "displayName": "Skeletons",
+      "shortName": "Skels",
+      "type": "TROOP",
+      "elixir": 1,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000010.png"
+    },
+    {
+      "id": "valkyrie",
+      "supercellId": 26000011,
+      "displayName": "Valkyrie",
+      "shortName": "Valk",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000011.png"
+    },
+    {
+      "id": "skeleton_army",
+      "supercellId": 26000012,
+      "displayName": "Skeleton Army",
+      "shortName": "Sk Army",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000012.png"
+    },
+    {
+      "id": "bomber",
+      "supercellId": 26000013,
+      "displayName": "Bomber",
+      "shortName": "Bomber",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000013.png"
+    },
+    {
+      "id": "musketeer",
+      "supercellId": 26000014,
+      "displayName": "Musketeer",
+      "shortName": "Musket",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000014.png"
+    },
+    {
+      "id": "baby_dragon",
+      "supercellId": 26000015,
+      "displayName": "Baby Dragon",
+      "shortName": "Baby D",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000015.png"
+    },
+    {
+      "id": "prince",
+      "supercellId": 26000016,
+      "displayName": "Prince",
+      "shortName": "Prince",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000016.png"
+    },
+    {
+      "id": "wizard",
+      "supercellId": 26000017,
+      "displayName": "Wizard",
+      "shortName": "Wizard",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000017.png"
+    },
+    {
+      "id": "mini_pekka",
+      "supercellId": 26000018,
+      "displayName": "Mini P.E.K.K.A",
+      "shortName": "Mini P",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000018.png"
+    },
+    {
+      "id": "spear_goblins",
+      "supercellId": 26000019,
+      "displayName": "Spear Goblins",
+      "shortName": "Spears",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000019.png"
+    },
+    {
+      "id": "giant_skeleton",
+      "supercellId": 26000020,
+      "displayName": "Giant Skeleton",
+      "shortName": "G Skeleton",
+      "type": "TROOP",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000020.png"
+    },
+    {
+      "id": "hog_rider",
+      "supercellId": 26000021,
+      "displayName": "Hog Rider",
+      "shortName": "Hog",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000021.png"
+    },
+    {
+      "id": "minion_horde",
+      "supercellId": 26000022,
+      "displayName": "Minion Horde",
+      "shortName": "Horde",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000022.png"
+    },
+    {
+      "id": "ice_wizard",
+      "supercellId": 26000023,
+      "displayName": "Ice Wizard",
+      "shortName": "Ice Wiz",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000023.png"
+    },
+    {
+      "id": "royal_giant",
+      "supercellId": 26000024,
+      "displayName": "Royal Giant",
+      "shortName": "RG",
+      "type": "TROOP",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000024.png"
+    },
+    {
+      "id": "guards",
+      "supercellId": 26000025,
+      "displayName": "Guards",
+      "shortName": "Guards",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000025.png"
+    },
+    {
+      "id": "princess",
+      "supercellId": 26000026,
+      "displayName": "Princess",
+      "shortName": "Princess",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000026.png"
+    },
+    {
+      "id": "dark_prince",
+      "supercellId": 26000027,
+      "displayName": "Dark Prince",
+      "shortName": "D Prince",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000027.png"
+    },
+    {
+      "id": "three_musketeers",
+      "supercellId": 26000028,
+      "displayName": "Three Musketeers",
+      "shortName": "3 Musks",
+      "type": "TROOP",
+      "elixir": 9,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000028.png"
+    },
+    {
+      "id": "lava_hound",
+      "supercellId": 26000029,
+      "displayName": "Lava Hound",
+      "shortName": "Lava",
+      "type": "TROOP",
+      "elixir": 7,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000029.png"
+    },
+    {
+      "id": "ice_spirit",
+      "supercellId": 26000030,
+      "displayName": "Ice Spirit",
+      "shortName": "Spirit",
+      "type": "TROOP",
+      "elixir": 1,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000030.png"
+    },
+    {
+      "id": "fire_spirit",
+      "supercellId": 26000031,
+      "displayName": "Fire Spirit",
+      "shortName": "F Spirit",
+      "type": "TROOP",
+      "elixir": 1,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000031.png"
+    },
+    {
+      "id": "miner",
+      "supercellId": 26000032,
+      "displayName": "Miner",
+      "shortName": "Miner",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000032.png"
+    },
+    {
+      "id": "sparky",
+      "supercellId": 26000033,
+      "displayName": "Sparky",
+      "shortName": "Sparky",
+      "type": "TROOP",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000033.png"
+    },
+    {
+      "id": "bowler",
+      "supercellId": 26000034,
+      "displayName": "Bowler",
+      "shortName": "Bowler",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000034.png"
+    },
+    {
+      "id": "lumberjack",
+      "supercellId": 26000035,
+      "displayName": "Lumberjack",
+      "shortName": "Lumberjack",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000035.png"
+    },
+    {
+      "id": "battle_ram",
+      "supercellId": 26000036,
+      "displayName": "Battle Ram",
+      "shortName": "B Ram",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000036.png"
+    },
+    {
+      "id": "inferno_dragon",
+      "supercellId": 26000037,
+      "displayName": "Inferno Dragon",
+      "shortName": "I Dragon",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000037.png"
+    },
+    {
+      "id": "ice_golem",
+      "supercellId": 26000038,
+      "displayName": "Ice Golem",
+      "shortName": "Ice Golem",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000038.png"
+    },
+    {
+      "id": "mega_minion",
+      "supercellId": 26000039,
+      "displayName": "Mega Minion",
+      "shortName": "Mega Minion",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000039.png"
+    },
+    {
+      "id": "dart_goblin",
+      "supercellId": 26000040,
+      "displayName": "Dart Goblin",
+      "shortName": "Dart Goblin",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000040.png"
+    },
+    {
+      "id": "goblin_gang",
+      "supercellId": 26000041,
+      "displayName": "Goblin Gang",
+      "shortName": "Gang",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000041.png"
+    },
+    {
+      "id": "electro_wizard",
+      "supercellId": 26000042,
+      "displayName": "Electro Wizard",
+      "shortName": "E Wiz",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000042.png"
+    },
+    {
+      "id": "elite_barbarians",
+      "supercellId": 26000043,
+      "displayName": "Elite Barbarians",
+      "shortName": "E Barbs",
+      "type": "TROOP",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000043.png"
+    },
+    {
+      "id": "hunter",
+      "supercellId": 26000044,
+      "displayName": "Hunter",
+      "shortName": "Hunter",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000044.png"
+    },
+    {
+      "id": "executioner",
+      "supercellId": 26000045,
+      "displayName": "Executioner",
+      "shortName": "Executioner",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000045.png"
+    },
+    {
+      "id": "bandit",
+      "supercellId": 26000046,
+      "displayName": "Bandit",
+      "shortName": "Bandit",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000046.png"
+    },
+    {
+      "id": "royal_recruits",
+      "supercellId": 26000047,
+      "displayName": "Royal Recruits",
+      "shortName": "Recruits",
+      "type": "TROOP",
+      "elixir": 7,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000047.png"
+    },
+    {
+      "id": "night_witch",
+      "supercellId": 26000048,
+      "displayName": "Night Witch",
+      "shortName": "N Witch",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000048.png"
+    },
+    {
+      "id": "bats",
+      "supercellId": 26000049,
+      "displayName": "Bats",
+      "shortName": "Bats",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000049.png"
+    },
+    {
+      "id": "royal_ghost",
+      "supercellId": 26000050,
+      "displayName": "Royal Ghost",
+      "shortName": "Ghost",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000050.png"
+    },
+    {
+      "id": "ram_rider",
+      "supercellId": 26000051,
+      "displayName": "Ram Rider",
+      "shortName": "Ram",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000051.png"
+    },
+    {
+      "id": "zappies",
+      "supercellId": 26000052,
+      "displayName": "Zappies",
+      "shortName": "Zappies",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000052.png"
+    },
+    {
+      "id": "rascals",
+      "supercellId": 26000053,
+      "displayName": "Rascals",
+      "shortName": "Rascals",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000053.png"
+    },
+    {
+      "id": "cannon_cart",
+      "supercellId": 26000054,
+      "displayName": "Cannon Cart",
+      "shortName": "Cart",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000054.png"
+    },
+    {
+      "id": "mega_knight",
+      "supercellId": 26000055,
+      "displayName": "Mega Knight",
+      "shortName": "MK",
+      "type": "TROOP",
+      "elixir": 7,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000055.png"
+    },
+    {
+      "id": "skeleton_barrel",
+      "supercellId": 26000056,
+      "displayName": "Skeleton Barrel",
+      "shortName": "Sk Barrel",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000056.png"
+    },
+    {
+      "id": "flying_machine",
+      "supercellId": 26000057,
+      "displayName": "Flying Machine",
+      "shortName": "Flying",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000057.png"
+    },
+    {
+      "id": "wall_breakers",
+      "supercellId": 26000058,
+      "displayName": "Wall Breakers",
+      "shortName": "Wall B",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000058.png"
+    },
+    {
+      "id": "royal_hogs",
+      "supercellId": 26000059,
+      "displayName": "Royal Hogs",
+      "shortName": "Hogs",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000059.png"
+    },
+    {
+      "id": "goblin_giant",
+      "supercellId": 26000060,
+      "displayName": "Goblin Giant",
+      "shortName": "G Giant",
+      "type": "TROOP",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000060.png"
+    },
+    {
+      "id": "fisherman",
+      "supercellId": 26000061,
+      "displayName": "Fisherman",
+      "shortName": "Fisherman",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000061.png"
+    },
+    {
+      "id": "magic_archer",
+      "supercellId": 26000062,
+      "displayName": "Magic Archer",
+      "shortName": "Marcher",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000062.png"
+    },
+    {
+      "id": "electro_dragon",
+      "supercellId": 26000063,
+      "displayName": "Electro Dragon",
+      "shortName": "E Dragon",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000063.png"
+    },
+    {
+      "id": "firecracker",
+      "supercellId": 26000064,
+      "displayName": "Firecracker",
+      "shortName": "Firecrack",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000064.png"
+    },
+    {
+      "id": "mighty_miner",
+      "supercellId": 26000065,
+      "displayName": "Mighty Miner",
+      "shortName": "M Miner",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000065.png"
+    },
+    {
+      "id": "elixir_golem",
+      "supercellId": 26000067,
+      "displayName": "Elixir Golem",
+      "shortName": "E Golem",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000067.png"
+    },
+    {
+      "id": "battle_healer",
+      "supercellId": 26000068,
+      "displayName": "Battle Healer",
+      "shortName": "Healer",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000068.png"
+    },
+    {
+      "id": "skeleton_king",
+      "supercellId": 26000069,
+      "displayName": "Skeleton King",
+      "shortName": "Sk King",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000069.png"
+    },
+    {
+      "id": "archer_queen",
+      "supercellId": 26000072,
+      "displayName": "Archer Queen",
+      "shortName": "Queen",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000072.png"
+    },
+    {
+      "id": "golden_knight",
+      "supercellId": 26000074,
+      "displayName": "Golden Knight",
+      "shortName": "G Knight",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000074.png"
+    },
+    {
+      "id": "monk",
+      "supercellId": 26000077,
+      "displayName": "Monk",
+      "shortName": "Monk",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000077.png"
+    },
+    {
+      "id": "skeleton_dragons",
+      "supercellId": 26000080,
+      "displayName": "Skeleton Dragons",
+      "shortName": "Sk Dragons",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000080.png"
+    },
+    {
+      "id": "mother_witch",
+      "supercellId": 26000083,
+      "displayName": "Mother Witch",
+      "shortName": "M Witch",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000083.png"
+    },
+    {
+      "id": "electro_spirit",
+      "supercellId": 26000084,
+      "displayName": "Electro Spirit",
+      "shortName": "E Spirit",
+      "type": "TROOP",
+      "elixir": 1,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000084.png"
+    },
+    {
+      "id": "electro_giant",
+      "supercellId": 26000085,
+      "displayName": "Electro Giant",
+      "shortName": "E Giant",
+      "type": "TROOP",
+      "elixir": 7,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000085.png"
+    },
+    {
+      "id": "phoenix",
+      "supercellId": 26000087,
+      "displayName": "Phoenix",
+      "shortName": "Phoenix",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000087.png"
+    },
+    {
+      "id": "little_prince",
+      "supercellId": 26000093,
+      "displayName": "Little Prince",
+      "shortName": "L Prince",
+      "type": "TROOP",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000093.png"
+    },
+    {
+      "id": "goblin_demolisher",
+      "supercellId": 26000095,
+      "displayName": "Goblin Demolisher",
+      "shortName": "Demo",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000095.png"
+    },
+    {
+      "id": "goblin_machine",
+      "supercellId": 26000096,
+      "displayName": "Goblin Machine",
+      "shortName": "Machine",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000096.png"
+    },
+    {
+      "id": "suspicious_bush",
+      "supercellId": 26000097,
+      "displayName": "Suspicious Bush",
+      "shortName": "Bush",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000097.png"
+    },
+    {
+      "id": "goblinstein",
+      "supercellId": 26000099,
+      "displayName": "Goblinstein",
+      "shortName": "Goblinstein",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000099.png"
+    },
+    {
+      "id": "rune_giant",
+      "supercellId": 26000101,
+      "displayName": "Rune Giant",
+      "shortName": "Rune",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000101.png"
+    },
+    {
+      "id": "berserker",
+      "supercellId": 26000102,
+      "displayName": "Berserker",
+      "shortName": "Berserker",
+      "type": "TROOP",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000102.png"
+    },
+    {
+      "id": "boss_bandit",
+      "supercellId": 26000103,
+      "displayName": "Boss Bandit",
+      "shortName": "B Bandit",
+      "type": "TROOP",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000103.png"
+    },
+    {
+      "id": "ronin",
+      "supercellId": 26000106,
+      "displayName": "Ronin",
+      "shortName": "Ronin",
+      "type": "TROOP",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/26000106.png"
+    },
+    {
+      "id": "cannon",
+      "supercellId": 27000000,
+      "displayName": "Cannon",
+      "shortName": "Cannon",
+      "type": "BUILDING",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000000.png"
+    },
+    {
+      "id": "goblin_hut",
+      "supercellId": 27000001,
+      "displayName": "Goblin Hut",
+      "shortName": "Gob Hut",
+      "type": "BUILDING",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000001.png"
+    },
+    {
+      "id": "mortar",
+      "supercellId": 27000002,
+      "displayName": "Mortar",
+      "shortName": "Mortar",
+      "type": "BUILDING",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000002.png"
+    },
+    {
+      "id": "inferno_tower",
+      "supercellId": 27000003,
+      "displayName": "Inferno Tower",
+      "shortName": "I Tower",
+      "type": "BUILDING",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000003.png"
+    },
+    {
+      "id": "bomb_tower",
+      "supercellId": 27000004,
+      "displayName": "Bomb Tower",
+      "shortName": "B Tower",
+      "type": "BUILDING",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000004.png"
+    },
+    {
+      "id": "barbarian_hut",
+      "supercellId": 27000005,
+      "displayName": "Barbarian Hut",
+      "shortName": "Barb Hut",
+      "type": "BUILDING",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000005.png"
+    },
+    {
+      "id": "tesla",
+      "supercellId": 27000006,
+      "displayName": "Tesla",
+      "shortName": "Tesla",
+      "type": "BUILDING",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000006.png"
+    },
+    {
+      "id": "elixir_collector",
+      "supercellId": 27000007,
+      "displayName": "Elixir Collector",
+      "shortName": "Pump",
+      "type": "BUILDING",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000007.png"
+    },
+    {
+      "id": "x_bow",
+      "supercellId": 27000008,
+      "displayName": "X-Bow",
+      "shortName": "X-Bow",
+      "type": "BUILDING",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000008.png"
+    },
+    {
+      "id": "tombstone",
+      "supercellId": 27000009,
+      "displayName": "Tombstone",
+      "shortName": "Tombstone",
+      "type": "BUILDING",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000009.png"
+    },
+    {
+      "id": "furnace",
+      "supercellId": 27000010,
+      "displayName": "Furnace",
+      "shortName": "Furnace",
+      "type": "BUILDING",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000010.png"
+    },
+    {
+      "id": "goblin_cage",
+      "supercellId": 27000012,
+      "displayName": "Goblin Cage",
+      "shortName": "Cage",
+      "type": "BUILDING",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000012.png"
+    },
+    {
+      "id": "goblin_drill",
+      "supercellId": 27000013,
+      "displayName": "Goblin Drill",
+      "shortName": "Drill",
+      "type": "BUILDING",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/27000013.png"
+    },
+    {
+      "id": "fireball",
+      "supercellId": 28000000,
+      "displayName": "Fireball",
+      "shortName": "Fire",
+      "type": "SPELL",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000000.png"
+    },
+    {
+      "id": "arrows",
+      "supercellId": 28000001,
+      "displayName": "Arrows",
+      "shortName": "Arrows",
+      "type": "SPELL",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000001.png"
+    },
+    {
+      "id": "rage",
+      "supercellId": 28000002,
+      "displayName": "Rage",
+      "shortName": "Rage",
+      "type": "SPELL",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000002.png"
+    },
+    {
+      "id": "rocket",
+      "supercellId": 28000003,
+      "displayName": "Rocket",
+      "shortName": "Rocket",
+      "type": "SPELL",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000003.png"
+    },
+    {
+      "id": "goblin_barrel",
+      "supercellId": 28000004,
+      "displayName": "Goblin Barrel",
+      "shortName": "Barrel",
+      "type": "SPELL",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000004.png"
+    },
+    {
+      "id": "freeze",
+      "supercellId": 28000005,
+      "displayName": "Freeze",
+      "shortName": "Freeze",
+      "type": "SPELL",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000005.png"
+    },
+    {
+      "id": "mirror",
+      "supercellId": 28000006,
+      "displayName": "Mirror",
+      "shortName": "Mirror",
+      "type": "SPELL",
+      "elixir": null,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000006.png"
+    },
+    {
+      "id": "lightning",
+      "supercellId": 28000007,
+      "displayName": "Lightning",
+      "shortName": "Lightning",
+      "type": "SPELL",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000007.png"
+    },
+    {
+      "id": "zap",
+      "supercellId": 28000008,
+      "displayName": "Zap",
+      "shortName": "Zap",
+      "type": "SPELL",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000008.png"
+    },
+    {
+      "id": "poison",
+      "supercellId": 28000009,
+      "displayName": "Poison",
+      "shortName": "Poison",
+      "type": "SPELL",
+      "elixir": 4,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000009.png"
+    },
+    {
+      "id": "graveyard",
+      "supercellId": 28000010,
+      "displayName": "Graveyard",
+      "shortName": "Graveyard",
+      "type": "SPELL",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000010.png"
+    },
+    {
+      "id": "the_log",
+      "supercellId": 28000011,
+      "displayName": "The Log",
+      "shortName": "Log",
+      "type": "SPELL",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000011.png"
+    },
+    {
+      "id": "tornado",
+      "supercellId": 28000012,
+      "displayName": "Tornado",
+      "shortName": "Tornado",
+      "type": "SPELL",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000012.png"
+    },
+    {
+      "id": "clone",
+      "supercellId": 28000013,
+      "displayName": "Clone",
+      "shortName": "Clone",
+      "type": "SPELL",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000013.png"
+    },
+    {
+      "id": "earthquake",
+      "supercellId": 28000014,
+      "displayName": "Earthquake",
+      "shortName": "Earthquake",
+      "type": "SPELL",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000014.png"
+    },
+    {
+      "id": "barbarian_barrel",
+      "supercellId": 28000015,
+      "displayName": "Barbarian Barrel",
+      "shortName": "Barb Barrel",
+      "type": "SPELL",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000015.png"
+    },
+    {
+      "id": "heal_spirit",
+      "supercellId": 28000016,
+      "displayName": "Heal Spirit",
+      "shortName": "Heal Spirit",
+      "type": "TROOP",
+      "elixir": 1,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000016.png"
+    },
+    {
+      "id": "giant_snowball",
+      "supercellId": 28000017,
+      "displayName": "Giant Snowball",
+      "shortName": "Snowball",
+      "type": "SPELL",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000017.png"
+    },
+    {
+      "id": "royal_delivery",
+      "supercellId": 28000018,
+      "displayName": "Royal Delivery",
+      "shortName": "Delivery",
+      "type": "SPELL",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000018.png"
+    },
+    {
+      "id": "void",
+      "supercellId": 28000023,
+      "displayName": "Void",
+      "shortName": "Void",
+      "type": "SPELL",
+      "elixir": 5,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000023.png"
+    },
+    {
+      "id": "goblin_curse",
+      "supercellId": 28000024,
+      "displayName": "Goblin Curse",
+      "shortName": "G Curse",
+      "type": "SPELL",
+      "elixir": 2,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000024.png"
+    },
+    {
+      "id": "spirit_empress",
+      "supercellId": 28000025,
+      "displayName": "Spirit Empress",
+      "shortName": "Empress",
+      "type": "TROOP",
+      "elixir": 6,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000025.png"
+    },
+    {
+      "id": "vines",
+      "supercellId": 28000026,
+      "displayName": "Vines",
+      "shortName": "Vines",
+      "type": "SPELL",
+      "elixir": 3,
+      "cycleEligible": true,
+      "iconAssetPath": "card-icons/28000026.png"
+    },
+    {
+      "id": "tower_princess",
+      "supercellId": 159000000,
+      "displayName": "Tower Princess",
+      "shortName": "Tower",
+      "type": "TOWER_TROOP",
+      "elixir": null,
+      "cycleEligible": false,
+      "iconAssetPath": "card-icons/159000000.png"
+    },
+    {
+      "id": "cannoneer",
+      "supercellId": 159000001,
+      "displayName": "Cannoneer",
+      "shortName": "Cannoneer",
+      "type": "TOWER_TROOP",
+      "elixir": null,
+      "cycleEligible": false,
+      "iconAssetPath": "card-icons/159000001.png"
+    },
+    {
+      "id": "dagger_duchess",
+      "supercellId": 159000002,
+      "displayName": "Dagger Duchess",
+      "shortName": "Duchess",
+      "type": "TOWER_TROOP",
+      "elixir": null,
+      "cycleEligible": false,
+      "iconAssetPath": "card-icons/159000002.png"
+    },
+    {
+      "id": "royal_chef",
+      "supercellId": 159000004,
+      "displayName": "Royal Chef",
+      "shortName": "Chef",
+      "type": "TOWER_TROOP",
+      "elixir": null,
+      "cycleEligible": false,
+      "iconAssetPath": "card-icons/159000004.png"
+    }
+  ],
+  "visualForms": [
+    {
+      "id": "knight_normal",
+      "canonicalCardId": "knight",
+      "form": "NORMAL",
+      "displayName": "Knight"
+    },
+    {
+      "id": "knight_evolution",
+      "canonicalCardId": "knight",
+      "form": "EVOLUTION",
+      "displayName": "Knight Evolution"
+    },
+    {
+      "id": "hero_knight",
+      "canonicalCardId": "knight",
+      "form": "HERO",
+      "displayName": "Hero Knight"
+    },
+    {
+      "id": "archers_normal",
+      "canonicalCardId": "archers",
+      "form": "NORMAL",
+      "displayName": "Archers"
+    },
+    {
+      "id": "archers_evolution",
+      "canonicalCardId": "archers",
+      "form": "EVOLUTION",
+      "displayName": "Archers Evolution"
+    },
+    {
+      "id": "goblins_normal",
+      "canonicalCardId": "goblins",
+      "form": "NORMAL",
+      "displayName": "Goblins"
+    },
+    {
+      "id": "hero_goblins",
+      "canonicalCardId": "goblins",
+      "form": "HERO",
+      "displayName": "Hero Goblins"
+    },
+    {
+      "id": "giant_normal",
+      "canonicalCardId": "giant",
+      "form": "NORMAL",
+      "displayName": "Giant"
+    },
+    {
+      "id": "hero_giant",
+      "canonicalCardId": "giant",
+      "form": "HERO",
+      "displayName": "Hero Giant"
+    },
+    {
+      "id": "pekka_normal",
+      "canonicalCardId": "pekka",
+      "form": "NORMAL",
+      "displayName": "P.E.K.K.A"
+    },
+    {
+      "id": "pekka_evolution",
+      "canonicalCardId": "pekka",
+      "form": "EVOLUTION",
+      "displayName": "P.E.K.K.A Evolution"
+    },
+    {
+      "id": "minions_normal",
+      "canonicalCardId": "minions",
+      "form": "NORMAL",
+      "displayName": "Minions"
+    },
+    {
+      "id": "balloon_normal",
+      "canonicalCardId": "balloon",
+      "form": "NORMAL",
+      "displayName": "Balloon"
+    },
+    {
+      "id": "hero_balloon",
+      "canonicalCardId": "balloon",
+      "form": "HERO",
+      "displayName": "Hero Balloon"
+    },
+    {
+      "id": "witch_normal",
+      "canonicalCardId": "witch",
+      "form": "NORMAL",
+      "displayName": "Witch"
+    },
+    {
+      "id": "witch_evolution",
+      "canonicalCardId": "witch",
+      "form": "EVOLUTION",
+      "displayName": "Witch Evolution"
+    },
+    {
+      "id": "barbarians_normal",
+      "canonicalCardId": "barbarians",
+      "form": "NORMAL",
+      "displayName": "Barbarians"
+    },
+    {
+      "id": "barbarians_evolution",
+      "canonicalCardId": "barbarians",
+      "form": "EVOLUTION",
+      "displayName": "Barbarians Evolution"
+    },
+    {
+      "id": "golem_normal",
+      "canonicalCardId": "golem",
+      "form": "NORMAL",
+      "displayName": "Golem"
+    },
+    {
+      "id": "skeletons_normal",
+      "canonicalCardId": "skeletons",
+      "form": "NORMAL",
+      "displayName": "Skeletons"
+    },
+    {
+      "id": "skeletons_evolution",
+      "canonicalCardId": "skeletons",
+      "form": "EVOLUTION",
+      "displayName": "Skeletons Evolution"
+    },
+    {
+      "id": "valkyrie_normal",
+      "canonicalCardId": "valkyrie",
+      "form": "NORMAL",
+      "displayName": "Valkyrie"
+    },
+    {
+      "id": "valkyrie_evolution",
+      "canonicalCardId": "valkyrie",
+      "form": "EVOLUTION",
+      "displayName": "Valkyrie Evolution"
+    },
+    {
+      "id": "hero_valkyrie",
+      "canonicalCardId": "valkyrie",
+      "form": "HERO",
+      "displayName": "Hero Valkyrie"
+    },
+    {
+      "id": "skeleton_army_normal",
+      "canonicalCardId": "skeleton_army",
+      "form": "NORMAL",
+      "displayName": "Skeleton Army"
+    },
+    {
+      "id": "skeleton_army_evolution",
+      "canonicalCardId": "skeleton_army",
+      "form": "EVOLUTION",
+      "displayName": "Skeleton Army Evolution"
+    },
+    {
+      "id": "bomber_normal",
+      "canonicalCardId": "bomber",
+      "form": "NORMAL",
+      "displayName": "Bomber"
+    },
+    {
+      "id": "bomber_evolution",
+      "canonicalCardId": "bomber",
+      "form": "EVOLUTION",
+      "displayName": "Bomber Evolution"
+    },
+    {
+      "id": "musketeer_normal",
+      "canonicalCardId": "musketeer",
+      "form": "NORMAL",
+      "displayName": "Musketeer"
+    },
+    {
+      "id": "musketeer_evolution",
+      "canonicalCardId": "musketeer",
+      "form": "EVOLUTION",
+      "displayName": "Musketeer Evolution"
+    },
+    {
+      "id": "hero_musketeer",
+      "canonicalCardId": "musketeer",
+      "form": "HERO",
+      "displayName": "Hero Musketeer"
+    },
+    {
+      "id": "baby_dragon_normal",
+      "canonicalCardId": "baby_dragon",
+      "form": "NORMAL",
+      "displayName": "Baby Dragon"
+    },
+    {
+      "id": "baby_dragon_evolution",
+      "canonicalCardId": "baby_dragon",
+      "form": "EVOLUTION",
+      "displayName": "Baby Dragon Evolution"
+    },
+    {
+      "id": "prince_normal",
+      "canonicalCardId": "prince",
+      "form": "NORMAL",
+      "displayName": "Prince"
+    },
+    {
+      "id": "wizard_normal",
+      "canonicalCardId": "wizard",
+      "form": "NORMAL",
+      "displayName": "Wizard"
+    },
+    {
+      "id": "wizard_evolution",
+      "canonicalCardId": "wizard",
+      "form": "EVOLUTION",
+      "displayName": "Wizard Evolution"
+    },
+    {
+      "id": "hero_wizard",
+      "canonicalCardId": "wizard",
+      "form": "HERO",
+      "displayName": "Hero Wizard"
+    },
+    {
+      "id": "mini_pekka_normal",
+      "canonicalCardId": "mini_pekka",
+      "form": "NORMAL",
+      "displayName": "Mini P.E.K.K.A"
+    },
+    {
+      "id": "hero_mini_pekka",
+      "canonicalCardId": "mini_pekka",
+      "form": "HERO",
+      "displayName": "Hero Mini P.E.K.K.A"
+    },
+    {
+      "id": "spear_goblins_normal",
+      "canonicalCardId": "spear_goblins",
+      "form": "NORMAL",
+      "displayName": "Spear Goblins"
+    },
+    {
+      "id": "giant_skeleton_normal",
+      "canonicalCardId": "giant_skeleton",
+      "form": "NORMAL",
+      "displayName": "Giant Skeleton"
+    },
+    {
+      "id": "hog_rider_normal",
+      "canonicalCardId": "hog_rider",
+      "form": "NORMAL",
+      "displayName": "Hog Rider"
+    },
+    {
+      "id": "minion_horde_normal",
+      "canonicalCardId": "minion_horde",
+      "form": "NORMAL",
+      "displayName": "Minion Horde"
+    },
+    {
+      "id": "minion_horde_evolution",
+      "canonicalCardId": "minion_horde",
+      "form": "EVOLUTION",
+      "displayName": "Minion Horde Evolution"
+    },
+    {
+      "id": "ice_wizard_normal",
+      "canonicalCardId": "ice_wizard",
+      "form": "NORMAL",
+      "displayName": "Ice Wizard"
+    },
+    {
+      "id": "royal_giant_normal",
+      "canonicalCardId": "royal_giant",
+      "form": "NORMAL",
+      "displayName": "Royal Giant"
+    },
+    {
+      "id": "royal_giant_evolution",
+      "canonicalCardId": "royal_giant",
+      "form": "EVOLUTION",
+      "displayName": "Royal Giant Evolution"
+    },
+    {
+      "id": "guards_normal",
+      "canonicalCardId": "guards",
+      "form": "NORMAL",
+      "displayName": "Guards"
+    },
+    {
+      "id": "princess_normal",
+      "canonicalCardId": "princess",
+      "form": "NORMAL",
+      "displayName": "Princess"
+    },
+    {
+      "id": "princess_evolution",
+      "canonicalCardId": "princess",
+      "form": "EVOLUTION",
+      "displayName": "Princess Evolution"
+    },
+    {
+      "id": "dark_prince_normal",
+      "canonicalCardId": "dark_prince",
+      "form": "NORMAL",
+      "displayName": "Dark Prince"
+    },
+    {
+      "id": "hero_dark_prince",
+      "canonicalCardId": "dark_prince",
+      "form": "HERO",
+      "displayName": "Hero Dark Prince"
+    },
+    {
+      "id": "three_musketeers_normal",
+      "canonicalCardId": "three_musketeers",
+      "form": "NORMAL",
+      "displayName": "Three Musketeers"
+    },
+    {
+      "id": "lava_hound_normal",
+      "canonicalCardId": "lava_hound",
+      "form": "NORMAL",
+      "displayName": "Lava Hound"
+    },
+    {
+      "id": "ice_spirit_normal",
+      "canonicalCardId": "ice_spirit",
+      "form": "NORMAL",
+      "displayName": "Ice Spirit"
+    },
+    {
+      "id": "ice_spirit_evolution",
+      "canonicalCardId": "ice_spirit",
+      "form": "EVOLUTION",
+      "displayName": "Ice Spirit Evolution"
+    },
+    {
+      "id": "fire_spirit_normal",
+      "canonicalCardId": "fire_spirit",
+      "form": "NORMAL",
+      "displayName": "Fire Spirit"
+    },
+    {
+      "id": "miner_normal",
+      "canonicalCardId": "miner",
+      "form": "NORMAL",
+      "displayName": "Miner"
+    },
+    {
+      "id": "sparky_normal",
+      "canonicalCardId": "sparky",
+      "form": "NORMAL",
+      "displayName": "Sparky"
+    },
+    {
+      "id": "bowler_normal",
+      "canonicalCardId": "bowler",
+      "form": "NORMAL",
+      "displayName": "Bowler"
+    },
+    {
+      "id": "hero_bowler",
+      "canonicalCardId": "bowler",
+      "form": "HERO",
+      "displayName": "Hero Bowler"
+    },
+    {
+      "id": "lumberjack_normal",
+      "canonicalCardId": "lumberjack",
+      "form": "NORMAL",
+      "displayName": "Lumberjack"
+    },
+    {
+      "id": "lumberjack_evolution",
+      "canonicalCardId": "lumberjack",
+      "form": "EVOLUTION",
+      "displayName": "Lumberjack Evolution"
+    },
+    {
+      "id": "battle_ram_normal",
+      "canonicalCardId": "battle_ram",
+      "form": "NORMAL",
+      "displayName": "Battle Ram"
+    },
+    {
+      "id": "battle_ram_evolution",
+      "canonicalCardId": "battle_ram",
+      "form": "EVOLUTION",
+      "displayName": "Battle Ram Evolution"
+    },
+    {
+      "id": "inferno_dragon_normal",
+      "canonicalCardId": "inferno_dragon",
+      "form": "NORMAL",
+      "displayName": "Inferno Dragon"
+    },
+    {
+      "id": "inferno_dragon_evolution",
+      "canonicalCardId": "inferno_dragon",
+      "form": "EVOLUTION",
+      "displayName": "Inferno Dragon Evolution"
+    },
+    {
+      "id": "ice_golem_normal",
+      "canonicalCardId": "ice_golem",
+      "form": "NORMAL",
+      "displayName": "Ice Golem"
+    },
+    {
+      "id": "hero_ice_golem",
+      "canonicalCardId": "ice_golem",
+      "form": "HERO",
+      "displayName": "Hero Ice Golem"
+    },
+    {
+      "id": "mega_minion_normal",
+      "canonicalCardId": "mega_minion",
+      "form": "NORMAL",
+      "displayName": "Mega Minion"
+    },
+    {
+      "id": "hero_mega_minion",
+      "canonicalCardId": "mega_minion",
+      "form": "HERO",
+      "displayName": "Hero Mega Minion"
+    },
+    {
+      "id": "dart_goblin_normal",
+      "canonicalCardId": "dart_goblin",
+      "form": "NORMAL",
+      "displayName": "Dart Goblin"
+    },
+    {
+      "id": "dart_goblin_evolution",
+      "canonicalCardId": "dart_goblin",
+      "form": "EVOLUTION",
+      "displayName": "Dart Goblin Evolution"
+    },
+    {
+      "id": "goblin_gang_normal",
+      "canonicalCardId": "goblin_gang",
+      "form": "NORMAL",
+      "displayName": "Goblin Gang"
+    },
+    {
+      "id": "electro_wizard_normal",
+      "canonicalCardId": "electro_wizard",
+      "form": "NORMAL",
+      "displayName": "Electro Wizard"
+    },
+    {
+      "id": "elite_barbarians_normal",
+      "canonicalCardId": "elite_barbarians",
+      "form": "NORMAL",
+      "displayName": "Elite Barbarians"
+    },
+    {
+      "id": "elite_barbarians_evolution",
+      "canonicalCardId": "elite_barbarians",
+      "form": "EVOLUTION",
+      "displayName": "Elite Barbarians Evolution"
+    },
+    {
+      "id": "hunter_normal",
+      "canonicalCardId": "hunter",
+      "form": "NORMAL",
+      "displayName": "Hunter"
+    },
+    {
+      "id": "hunter_evolution",
+      "canonicalCardId": "hunter",
+      "form": "EVOLUTION",
+      "displayName": "Hunter Evolution"
+    },
+    {
+      "id": "executioner_normal",
+      "canonicalCardId": "executioner",
+      "form": "NORMAL",
+      "displayName": "Executioner"
+    },
+    {
+      "id": "executioner_evolution",
+      "canonicalCardId": "executioner",
+      "form": "EVOLUTION",
+      "displayName": "Executioner Evolution"
+    },
+    {
+      "id": "bandit_normal",
+      "canonicalCardId": "bandit",
+      "form": "NORMAL",
+      "displayName": "Bandit"
+    },
+    {
+      "id": "royal_recruits_normal",
+      "canonicalCardId": "royal_recruits",
+      "form": "NORMAL",
+      "displayName": "Royal Recruits"
+    },
+    {
+      "id": "royal_recruits_evolution",
+      "canonicalCardId": "royal_recruits",
+      "form": "EVOLUTION",
+      "displayName": "Royal Recruits Evolution"
+    },
+    {
+      "id": "night_witch_normal",
+      "canonicalCardId": "night_witch",
+      "form": "NORMAL",
+      "displayName": "Night Witch"
+    },
+    {
+      "id": "bats_normal",
+      "canonicalCardId": "bats",
+      "form": "NORMAL",
+      "displayName": "Bats"
+    },
+    {
+      "id": "bats_evolution",
+      "canonicalCardId": "bats",
+      "form": "EVOLUTION",
+      "displayName": "Bats Evolution"
+    },
+    {
+      "id": "royal_ghost_normal",
+      "canonicalCardId": "royal_ghost",
+      "form": "NORMAL",
+      "displayName": "Royal Ghost"
+    },
+    {
+      "id": "royal_ghost_evolution",
+      "canonicalCardId": "royal_ghost",
+      "form": "EVOLUTION",
+      "displayName": "Royal Ghost Evolution"
+    },
+    {
+      "id": "ram_rider_normal",
+      "canonicalCardId": "ram_rider",
+      "form": "NORMAL",
+      "displayName": "Ram Rider"
+    },
+    {
+      "id": "zappies_normal",
+      "canonicalCardId": "zappies",
+      "form": "NORMAL",
+      "displayName": "Zappies"
+    },
+    {
+      "id": "rascals_normal",
+      "canonicalCardId": "rascals",
+      "form": "NORMAL",
+      "displayName": "Rascals"
+    },
+    {
+      "id": "cannon_cart_normal",
+      "canonicalCardId": "cannon_cart",
+      "form": "NORMAL",
+      "displayName": "Cannon Cart"
+    },
+    {
+      "id": "mega_knight_normal",
+      "canonicalCardId": "mega_knight",
+      "form": "NORMAL",
+      "displayName": "Mega Knight"
+    },
+    {
+      "id": "mega_knight_evolution",
+      "canonicalCardId": "mega_knight",
+      "form": "EVOLUTION",
+      "displayName": "Mega Knight Evolution"
+    },
+    {
+      "id": "skeleton_barrel_normal",
+      "canonicalCardId": "skeleton_barrel",
+      "form": "NORMAL",
+      "displayName": "Skeleton Barrel"
+    },
+    {
+      "id": "skeleton_barrel_evolution",
+      "canonicalCardId": "skeleton_barrel",
+      "form": "EVOLUTION",
+      "displayName": "Skeleton Barrel Evolution"
+    },
+    {
+      "id": "flying_machine_normal",
+      "canonicalCardId": "flying_machine",
+      "form": "NORMAL",
+      "displayName": "Flying Machine"
+    },
+    {
+      "id": "wall_breakers_normal",
+      "canonicalCardId": "wall_breakers",
+      "form": "NORMAL",
+      "displayName": "Wall Breakers"
+    },
+    {
+      "id": "wall_breakers_evolution",
+      "canonicalCardId": "wall_breakers",
+      "form": "EVOLUTION",
+      "displayName": "Wall Breakers Evolution"
+    },
+    {
+      "id": "royal_hogs_normal",
+      "canonicalCardId": "royal_hogs",
+      "form": "NORMAL",
+      "displayName": "Royal Hogs"
+    },
+    {
+      "id": "royal_hogs_evolution",
+      "canonicalCardId": "royal_hogs",
+      "form": "EVOLUTION",
+      "displayName": "Royal Hogs Evolution"
+    },
+    {
+      "id": "goblin_giant_normal",
+      "canonicalCardId": "goblin_giant",
+      "form": "NORMAL",
+      "displayName": "Goblin Giant"
+    },
+    {
+      "id": "goblin_giant_evolution",
+      "canonicalCardId": "goblin_giant",
+      "form": "EVOLUTION",
+      "displayName": "Goblin Giant Evolution"
+    },
+    {
+      "id": "fisherman_normal",
+      "canonicalCardId": "fisherman",
+      "form": "NORMAL",
+      "displayName": "Fisherman"
+    },
+    {
+      "id": "magic_archer_normal",
+      "canonicalCardId": "magic_archer",
+      "form": "NORMAL",
+      "displayName": "Magic Archer"
+    },
+    {
+      "id": "hero_magic_archer",
+      "canonicalCardId": "magic_archer",
+      "form": "HERO",
+      "displayName": "Hero Magic Archer"
+    },
+    {
+      "id": "electro_dragon_normal",
+      "canonicalCardId": "electro_dragon",
+      "form": "NORMAL",
+      "displayName": "Electro Dragon"
+    },
+    {
+      "id": "electro_dragon_evolution",
+      "canonicalCardId": "electro_dragon",
+      "form": "EVOLUTION",
+      "displayName": "Electro Dragon Evolution"
+    },
+    {
+      "id": "firecracker_normal",
+      "canonicalCardId": "firecracker",
+      "form": "NORMAL",
+      "displayName": "Firecracker"
+    },
+    {
+      "id": "firecracker_evolution",
+      "canonicalCardId": "firecracker",
+      "form": "EVOLUTION",
+      "displayName": "Firecracker Evolution"
+    },
+    {
+      "id": "mighty_miner_normal",
+      "canonicalCardId": "mighty_miner",
+      "form": "NORMAL",
+      "displayName": "Mighty Miner"
+    },
+    {
+      "id": "elixir_golem_normal",
+      "canonicalCardId": "elixir_golem",
+      "form": "NORMAL",
+      "displayName": "Elixir Golem"
+    },
+    {
+      "id": "battle_healer_normal",
+      "canonicalCardId": "battle_healer",
+      "form": "NORMAL",
+      "displayName": "Battle Healer"
+    },
+    {
+      "id": "skeleton_king_normal",
+      "canonicalCardId": "skeleton_king",
+      "form": "NORMAL",
+      "displayName": "Skeleton King"
+    },
+    {
+      "id": "archer_queen_normal",
+      "canonicalCardId": "archer_queen",
+      "form": "NORMAL",
+      "displayName": "Archer Queen"
+    },
+    {
+      "id": "golden_knight_normal",
+      "canonicalCardId": "golden_knight",
+      "form": "NORMAL",
+      "displayName": "Golden Knight"
+    },
+    {
+      "id": "monk_normal",
+      "canonicalCardId": "monk",
+      "form": "NORMAL",
+      "displayName": "Monk"
+    },
+    {
+      "id": "skeleton_dragons_normal",
+      "canonicalCardId": "skeleton_dragons",
+      "form": "NORMAL",
+      "displayName": "Skeleton Dragons"
+    },
+    {
+      "id": "mother_witch_normal",
+      "canonicalCardId": "mother_witch",
+      "form": "NORMAL",
+      "displayName": "Mother Witch"
+    },
+    {
+      "id": "electro_spirit_normal",
+      "canonicalCardId": "electro_spirit",
+      "form": "NORMAL",
+      "displayName": "Electro Spirit"
+    },
+    {
+      "id": "electro_giant_normal",
+      "canonicalCardId": "electro_giant",
+      "form": "NORMAL",
+      "displayName": "Electro Giant"
+    },
+    {
+      "id": "phoenix_normal",
+      "canonicalCardId": "phoenix",
+      "form": "NORMAL",
+      "displayName": "Phoenix"
+    },
+    {
+      "id": "little_prince_normal",
+      "canonicalCardId": "little_prince",
+      "form": "NORMAL",
+      "displayName": "Little Prince"
+    },
+    {
+      "id": "goblin_demolisher_normal",
+      "canonicalCardId": "goblin_demolisher",
+      "form": "NORMAL",
+      "displayName": "Goblin Demolisher"
+    },
+    {
+      "id": "goblin_machine_normal",
+      "canonicalCardId": "goblin_machine",
+      "form": "NORMAL",
+      "displayName": "Goblin Machine"
+    },
+    {
+      "id": "suspicious_bush_normal",
+      "canonicalCardId": "suspicious_bush",
+      "form": "NORMAL",
+      "displayName": "Suspicious Bush"
+    },
+    {
+      "id": "goblinstein_normal",
+      "canonicalCardId": "goblinstein",
+      "form": "NORMAL",
+      "displayName": "Goblinstein"
+    },
+    {
+      "id": "rune_giant_normal",
+      "canonicalCardId": "rune_giant",
+      "form": "NORMAL",
+      "displayName": "Rune Giant"
+    },
+    {
+      "id": "berserker_normal",
+      "canonicalCardId": "berserker",
+      "form": "NORMAL",
+      "displayName": "Berserker"
+    },
+    {
+      "id": "hero_berserker",
+      "canonicalCardId": "berserker",
+      "form": "HERO",
+      "displayName": "Hero Berserker"
+    },
+    {
+      "id": "boss_bandit_normal",
+      "canonicalCardId": "boss_bandit",
+      "form": "NORMAL",
+      "displayName": "Boss Bandit"
+    },
+    {
+      "id": "ronin_normal",
+      "canonicalCardId": "ronin",
+      "form": "NORMAL",
+      "displayName": "Ronin"
+    },
+    {
+      "id": "cannon_normal",
+      "canonicalCardId": "cannon",
+      "form": "NORMAL",
+      "displayName": "Cannon"
+    },
+    {
+      "id": "cannon_evolution",
+      "canonicalCardId": "cannon",
+      "form": "EVOLUTION",
+      "displayName": "Cannon Evolution"
+    },
+    {
+      "id": "goblin_hut_normal",
+      "canonicalCardId": "goblin_hut",
+      "form": "NORMAL",
+      "displayName": "Goblin Hut"
+    },
+    {
+      "id": "mortar_normal",
+      "canonicalCardId": "mortar",
+      "form": "NORMAL",
+      "displayName": "Mortar"
+    },
+    {
+      "id": "mortar_evolution",
+      "canonicalCardId": "mortar",
+      "form": "EVOLUTION",
+      "displayName": "Mortar Evolution"
+    },
+    {
+      "id": "inferno_tower_normal",
+      "canonicalCardId": "inferno_tower",
+      "form": "NORMAL",
+      "displayName": "Inferno Tower"
+    },
+    {
+      "id": "bomb_tower_normal",
+      "canonicalCardId": "bomb_tower",
+      "form": "NORMAL",
+      "displayName": "Bomb Tower"
+    },
+    {
+      "id": "barbarian_hut_normal",
+      "canonicalCardId": "barbarian_hut",
+      "form": "NORMAL",
+      "displayName": "Barbarian Hut"
+    },
+    {
+      "id": "tesla_normal",
+      "canonicalCardId": "tesla",
+      "form": "NORMAL",
+      "displayName": "Tesla"
+    },
+    {
+      "id": "tesla_evolution",
+      "canonicalCardId": "tesla",
+      "form": "EVOLUTION",
+      "displayName": "Tesla Evolution"
+    },
+    {
+      "id": "elixir_collector_normal",
+      "canonicalCardId": "elixir_collector",
+      "form": "NORMAL",
+      "displayName": "Elixir Collector"
+    },
+    {
+      "id": "x_bow_normal",
+      "canonicalCardId": "x_bow",
+      "form": "NORMAL",
+      "displayName": "X-Bow"
+    },
+    {
+      "id": "tombstone_normal",
+      "canonicalCardId": "tombstone",
+      "form": "NORMAL",
+      "displayName": "Tombstone"
+    },
+    {
+      "id": "hero_tombstone",
+      "canonicalCardId": "tombstone",
+      "form": "HERO",
+      "displayName": "Hero Tombstone"
+    },
+    {
+      "id": "furnace_normal",
+      "canonicalCardId": "furnace",
+      "form": "NORMAL",
+      "displayName": "Furnace"
+    },
+    {
+      "id": "furnace_evolution",
+      "canonicalCardId": "furnace",
+      "form": "EVOLUTION",
+      "displayName": "Furnace Evolution"
+    },
+    {
+      "id": "goblin_cage_normal",
+      "canonicalCardId": "goblin_cage",
+      "form": "NORMAL",
+      "displayName": "Goblin Cage"
+    },
+    {
+      "id": "goblin_cage_evolution",
+      "canonicalCardId": "goblin_cage",
+      "form": "EVOLUTION",
+      "displayName": "Goblin Cage Evolution"
+    },
+    {
+      "id": "goblin_drill_normal",
+      "canonicalCardId": "goblin_drill",
+      "form": "NORMAL",
+      "displayName": "Goblin Drill"
+    },
+    {
+      "id": "goblin_drill_evolution",
+      "canonicalCardId": "goblin_drill",
+      "form": "EVOLUTION",
+      "displayName": "Goblin Drill Evolution"
+    },
+    {
+      "id": "fireball_normal",
+      "canonicalCardId": "fireball",
+      "form": "NORMAL",
+      "displayName": "Fireball"
+    },
+    {
+      "id": "arrows_normal",
+      "canonicalCardId": "arrows",
+      "form": "NORMAL",
+      "displayName": "Arrows"
+    },
+    {
+      "id": "rage_normal",
+      "canonicalCardId": "rage",
+      "form": "NORMAL",
+      "displayName": "Rage"
+    },
+    {
+      "id": "rocket_normal",
+      "canonicalCardId": "rocket",
+      "form": "NORMAL",
+      "displayName": "Rocket"
+    },
+    {
+      "id": "goblin_barrel_normal",
+      "canonicalCardId": "goblin_barrel",
+      "form": "NORMAL",
+      "displayName": "Goblin Barrel"
+    },
+    {
+      "id": "goblin_barrel_evolution",
+      "canonicalCardId": "goblin_barrel",
+      "form": "EVOLUTION",
+      "displayName": "Goblin Barrel Evolution"
+    },
+    {
+      "id": "freeze_normal",
+      "canonicalCardId": "freeze",
+      "form": "NORMAL",
+      "displayName": "Freeze"
+    },
+    {
+      "id": "mirror_normal",
+      "canonicalCardId": "mirror",
+      "form": "NORMAL",
+      "displayName": "Mirror"
+    },
+    {
+      "id": "lightning_normal",
+      "canonicalCardId": "lightning",
+      "form": "NORMAL",
+      "displayName": "Lightning"
+    },
+    {
+      "id": "zap_normal",
+      "canonicalCardId": "zap",
+      "form": "NORMAL",
+      "displayName": "Zap"
+    },
+    {
+      "id": "zap_evolution",
+      "canonicalCardId": "zap",
+      "form": "EVOLUTION",
+      "displayName": "Zap Evolution"
+    },
+    {
+      "id": "poison_normal",
+      "canonicalCardId": "poison",
+      "form": "NORMAL",
+      "displayName": "Poison"
+    },
+    {
+      "id": "graveyard_normal",
+      "canonicalCardId": "graveyard",
+      "form": "NORMAL",
+      "displayName": "Graveyard"
+    },
+    {
+      "id": "the_log_normal",
+      "canonicalCardId": "the_log",
+      "form": "NORMAL",
+      "displayName": "The Log"
+    },
+    {
+      "id": "tornado_normal",
+      "canonicalCardId": "tornado",
+      "form": "NORMAL",
+      "displayName": "Tornado"
+    },
+    {
+      "id": "clone_normal",
+      "canonicalCardId": "clone",
+      "form": "NORMAL",
+      "displayName": "Clone"
+    },
+    {
+      "id": "earthquake_normal",
+      "canonicalCardId": "earthquake",
+      "form": "NORMAL",
+      "displayName": "Earthquake"
+    },
+    {
+      "id": "barbarian_barrel_normal",
+      "canonicalCardId": "barbarian_barrel",
+      "form": "NORMAL",
+      "displayName": "Barbarian Barrel"
+    },
+    {
+      "id": "hero_barbarian_barrel",
+      "canonicalCardId": "barbarian_barrel",
+      "form": "HERO",
+      "displayName": "Hero Barbarian Barrel"
+    },
+    {
+      "id": "heal_spirit_normal",
+      "canonicalCardId": "heal_spirit",
+      "form": "NORMAL",
+      "displayName": "Heal Spirit"
+    },
+    {
+      "id": "giant_snowball_normal",
+      "canonicalCardId": "giant_snowball",
+      "form": "NORMAL",
+      "displayName": "Giant Snowball"
+    },
+    {
+      "id": "giant_snowball_evolution",
+      "canonicalCardId": "giant_snowball",
+      "form": "EVOLUTION",
+      "displayName": "Giant Snowball Evolution"
+    },
+    {
+      "id": "royal_delivery_normal",
+      "canonicalCardId": "royal_delivery",
+      "form": "NORMAL",
+      "displayName": "Royal Delivery"
+    },
+    {
+      "id": "void_normal",
+      "canonicalCardId": "void",
+      "form": "NORMAL",
+      "displayName": "Void"
+    },
+    {
+      "id": "goblin_curse_normal",
+      "canonicalCardId": "goblin_curse",
+      "form": "NORMAL",
+      "displayName": "Goblin Curse"
+    },
+    {
+      "id": "spirit_empress_normal",
+      "canonicalCardId": "spirit_empress",
+      "form": "NORMAL",
+      "displayName": "Spirit Empress"
+    },
+    {
+      "id": "vines_normal",
+      "canonicalCardId": "vines",
+      "form": "NORMAL",
+      "displayName": "Vines"
+    },
+    {
+      "id": "tower_princess_normal",
+      "canonicalCardId": "tower_princess",
+      "form": "NORMAL",
+      "displayName": "Tower Princess"
+    },
+    {
+      "id": "cannoneer_normal",
+      "canonicalCardId": "cannoneer",
+      "form": "NORMAL",
+      "displayName": "Cannoneer"
+    },
+    {
+      "id": "dagger_duchess_normal",
+      "canonicalCardId": "dagger_duchess",
+      "form": "NORMAL",
+      "displayName": "Dagger Duchess"
+    },
+    {
+      "id": "royal_chef_normal",
+      "canonicalCardId": "royal_chef",
+      "form": "NORMAL",
+      "displayName": "Royal Chef"
+    }
+  ]
+}

@@ -15,6 +15,8 @@ class CycleTracker(
 
     fun discoveredCards(): Set<CardId> = observationHistory.toSet()
 
+    fun discoveredCardsInOrder(): List<CardId> = observationHistory.distinct()
+
     fun cardsPlayedSince(card: CardId): Int? {
         val lastObservationIndex = observationHistory.lastIndexOf(card)
         return if (lastObservationIndex < 0) {
