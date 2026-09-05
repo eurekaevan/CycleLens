@@ -3,9 +3,11 @@ package com.eureka.cyclelens
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
@@ -15,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import com.eureka.cyclelens.overlay.OverlayService
+import com.eureka.cyclelens.capture.CaptureService
 import com.eureka.cyclelens.ui.CycleLensTheme
 import com.eureka.cyclelens.ui.CycleTrackerRoute
 
@@ -24,6 +27,26 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission(),
     ) {
         startOverlayService()
+    }
+    private val captureConsentLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val captureState = cycleLensApplication.captureSessionState
+        val resultData = result.data
+        if (result.resultCode != RESULT_OK || resultData == null) {
+            captureState.rejectConsent()
+            return@registerForActivityResult
+        }
+
+        if (!captureState.acceptConsent()) {
+            return@registerForActivityResult
+        }
+        try {
+            CaptureService.start(this, result.resultCode, resultData)
+        } catch (error: RuntimeException) {
+            Log.e(TAG, "Unable to start capture service", error)
+            captureState.fail("Screen capture service could not start")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +62,12 @@ class MainActivity : ComponentActivity() {
                     artworkRepository = cycleLensApplication.cardArtworkRepository,
                     overlayQuickCards = cycleLensApplication.overlayQuickCards,
                     overlayConfiguration = cycleLensApplication.overlayConfiguration,
+                    captureState = cycleLensApplication.captureSessionState.state,
                     overlayPermissionGranted = overlayPermissionGranted,
                     onEnableOverlayClick = ::openOverlayPermissionSettings,
                     onStartOverlayClick = ::startOverlay,
+                    onStartCaptureClick = ::startCapture,
+                    onStopCaptureClick = ::stopCapture,
                 )
             }
         }
@@ -86,6 +112,29 @@ class MainActivity : ComponentActivity() {
         OverlayService.start(this)
     }
 
+    private fun startCapture() {
+        val captureState = cycleLensApplication.captureSessionState
+        if (!captureState.requestConsent()) {
+            return
+        }
+
+        try {
+            val projectionManager = getSystemService(MediaProjectionManager::class.java)
+            captureConsentLauncher.launch(projectionManager.createScreenCaptureIntent())
+        } catch (error: RuntimeException) {
+            Log.e(TAG, "Unable to open capture authorization", error)
+            captureState.fail("Screen capture authorization could not open")
+        }
+    }
+
+    private fun stopCapture() {
+        CaptureService.stop(this)
+    }
+
     private val cycleLensApplication: CycleLensApplication
         get() = application as CycleLensApplication
+
+    private companion object {
+        const val TAG = "CycleLensActivity"
+    }
 }

@@ -60,6 +60,7 @@ import com.eureka.cyclelens.TrackedCardUiState
 import com.eureka.cyclelens.TrackerUiState
 import com.eureka.cyclelens.catalog.CardArtworkRepository
 import com.eureka.cyclelens.catalog.CardCatalog
+import com.eureka.cyclelens.capture.CaptureState
 import com.eureka.cyclelens.overlay.OverlayBackgroundOpacity
 import com.eureka.cyclelens.overlay.OverlayConfiguration
 import com.eureka.cyclelens.overlay.OverlayDetailMode
@@ -68,6 +69,7 @@ import com.eureka.cyclelens.overlay.OverlaySizeMode
 import com.eureka.cyclelens.session.MatchSession
 import cyclelens.core.CardId
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -77,9 +79,12 @@ fun CycleTrackerRoute(
     artworkRepository: CardArtworkRepository,
     overlayQuickCards: OverlayQuickCards,
     overlayConfiguration: OverlayConfiguration,
+    captureState: StateFlow<CaptureState>,
     overlayPermissionGranted: Boolean,
     onEnableOverlayClick: () -> Unit,
     onStartOverlayClick: () -> Unit,
+    onStartCaptureClick: () -> Unit,
+    onStopCaptureClick: () -> Unit,
     trackerViewModel: CycleTrackerViewModel = viewModel(
         factory = CycleTrackerViewModel.Factory(
             matchSession = matchSession,
@@ -90,10 +95,12 @@ fun CycleTrackerRoute(
     ),
 ) {
     val state by trackerViewModel.uiState.collectAsStateWithLifecycle()
+    val currentCaptureState by captureState.collectAsStateWithLifecycle()
 
     CycleTrackerScreen(
         state = state,
         artworkRepository = artworkRepository,
+        captureState = currentCaptureState,
         onTrackedCardClick = trackerViewModel::observeTrackedCard,
         onAddCardClick = trackerViewModel::openCardPicker,
         onPickerDismiss = trackerViewModel::dismissCardPicker,
@@ -113,6 +120,8 @@ fun CycleTrackerRoute(
         overlayPermissionGranted = overlayPermissionGranted,
         onEnableOverlayClick = onEnableOverlayClick,
         onStartOverlayClick = onStartOverlayClick,
+        onStartCaptureClick = onStartCaptureClick,
+        onStopCaptureClick = onStopCaptureClick,
     )
 }
 
@@ -120,6 +129,7 @@ fun CycleTrackerRoute(
 fun CycleTrackerScreen(
     state: TrackerUiState,
     artworkRepository: CardArtworkRepository,
+    captureState: CaptureState,
     onTrackedCardClick: (CardId) -> Unit,
     onAddCardClick: () -> Unit,
     onPickerDismiss: () -> Unit,
@@ -139,6 +149,8 @@ fun CycleTrackerScreen(
     overlayPermissionGranted: Boolean,
     onEnableOverlayClick: () -> Unit,
     onStartOverlayClick: () -> Unit,
+    onStartCaptureClick: () -> Unit,
+    onStopCaptureClick: () -> Unit,
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -165,6 +177,12 @@ fun CycleTrackerScreen(
                 onSizeModeChanged = onOverlaySizeModeChanged,
                 onDetailModeChanged = onOverlayDetailModeChanged,
                 onBackgroundOpacityChanged = onOverlayBackgroundOpacityChanged,
+            )
+
+            CaptureControl(
+                state = captureState,
+                onStartClick = onStartCaptureClick,
+                onStopClick = onStopCaptureClick,
             )
 
             OverlayQuickCardsControl(
@@ -259,6 +277,117 @@ fun CycleTrackerScreen(
             onConfirm = onResetConfirm,
         )
     }
+}
+
+@Composable
+private fun CaptureControl(
+    state: CaptureState,
+    onStartClick: () -> Unit,
+    onStopClick: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = MaterialTheme.shapes.large,
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.screen_capture),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = stringResource(
+                    when (state) {
+                        CaptureState.Idle -> R.string.capture_status_idle
+                        CaptureState.RequestingConsent -> R.string.capture_status_requesting
+                        CaptureState.Starting -> R.string.capture_status_starting
+                        is CaptureState.Running -> R.string.capture_status_running
+                        is CaptureState.Error -> R.string.capture_status_error
+                    },
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            when (state) {
+                is CaptureState.Running -> CaptureStatsContent(state)
+                is CaptureState.Error -> Text(
+                    text = stringResource(R.string.capture_error_message, state.message),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+
+                else -> Unit
+            }
+
+            Button(
+                onClick = if (state is CaptureState.Running) onStopClick else onStartClick,
+                enabled = state == CaptureState.Idle ||
+                    state is CaptureState.Error ||
+                    state is CaptureState.Running,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+            ) {
+                Text(
+                    stringResource(
+                        when (state) {
+                            is CaptureState.Running -> R.string.stop_capture
+                            CaptureState.RequestingConsent,
+                            CaptureState.Starting,
+                            -> R.string.capture_busy
+
+                            else -> R.string.start_capture
+                        },
+                    ),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CaptureStatsContent(state: CaptureState.Running) {
+    val stats = state.stats
+    val unknown = stringResource(R.string.capture_value_unknown)
+    Text(
+        text = stringResource(R.string.capture_source_size, stats.width, stats.height),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(R.string.capture_fps, stats.currentFps, stats.averageFps),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(R.string.capture_frames, stats.receivedFrames),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(
+            R.string.capture_visible,
+            stringResource(
+                if (stats.capturedContentVisible) R.string.capture_yes else R.string.capture_no,
+            ),
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(
+            R.string.capture_frame_layout,
+            stats.planeCount?.toString() ?: unknown,
+            stats.pixelStride?.toString() ?: unknown,
+            stats.rowStride?.toString() ?: unknown,
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 @Composable
