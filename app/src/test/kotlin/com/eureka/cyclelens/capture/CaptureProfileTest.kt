@@ -23,7 +23,7 @@ class CaptureProfileTest {
     fun `profile changes only while idle or after error`() {
         val configuration = CaptureConfiguration()
         assertFalse(configuration.setProfile(CaptureProfile.ECO, CaptureState.Starting))
-        assertEquals(CaptureProfile.NATIVE, configuration.profile.value)
+        assertEquals(CaptureProfile.BALANCED, configuration.profile.value)
         assertTrue(configuration.setProfile(CaptureProfile.ECO, CaptureState.Idle))
         assertEquals(CaptureProfile.ECO, configuration.profile.value)
     }

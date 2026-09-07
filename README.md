@@ -2,7 +2,7 @@
 
 CycleLens 是一个本地优先的 Android 皇室战争手动牌序辅助工具。玩家点击对手刚打出的卡牌，应用会记录首次发现顺序，并显示关键牌距离再次可用还差几张。
 
-> 当前是开发阶段。Screen Capture 已完成 profile、采样、坐标映射和 debug-only 单帧校准边界，**没有卡牌识别，也不会自动记牌**。
+> 当前是开发阶段。Screen Capture 已完成 profile、采样、坐标映射和有界 arena pixel pipeline，**没有卡牌识别，也不会自动记牌**。
 
 ## 已实现
 
@@ -12,8 +12,10 @@ CycleLens 是一个本地优先的 Android 皇室战争手动牌序辅助工具�
 - Overlay 可调整尺寸、详细度和背景不透明度；默认是 `COMFORTABLE + MINIMAL + 50%`。
 - 离线 Canonical Card Catalog：126 个规范卡牌、122 张可记录卡牌、4 个 Tower Troop、184 个视觉形态和 126 张本地缩略图。
 - MediaProjection 帧入口：Native、Balanced、Eco 输出 profile，分别将 accepted analysis frame 限制为 30、15、10 FPS。
+- 新安装默认选择 Balanced；Native 保留为 correctness/benchmark 模式。
 - Capture geometry：区分 source/output 尺寸，并统一提供 source、output、normalized 坐标映射。
-- Debug build 可由用户主动保存一张 cache PNG；正式帧路径仍只产生 metadata/descriptor，不传递 Android `Image`。
+- Accepted frame 只把 arena 同步复制进 3 个复用的 direct buffer；容量 1 的 latest-frame queue 把数据交给单消费者，Android `Image` 不离开 callback。
+- Debug build 可由用户主动保存一张 cache PNG，并可用 0/20/50/100 ms analysis delay 验证背压；Release 不暴露这些控制。
 
 ## 快速开始
 
@@ -57,7 +59,7 @@ OverlayService  ─┼─→ MatchSession ─→ cycle-core/CycleTracker
 Local Catalog  ──┘
 
 Activity ─→ CaptureSessionStateStore ← CaptureService
-                                      ├─→ SamplingGate → AnalysisFrameDescriptor
+                                      ├─→ SamplingGate → arena copy → bounded analysis worker → discard
                                       └─→ debug-only one-shot cache PNG
 ```
 
@@ -78,7 +80,7 @@ Android 运行时只读取打包在 App 内的 `app/src/main/assets/cards.json` 
 
 - 不使用 AccessibilityService、Root、Hook、游戏进程读取、网络抓包、自动点击或手势模拟。
 - 不做 OCR/CV/模型推理；`VisualDetection` 目前只是一个未接入的边界 DTO。
-- Screen Capture 平时只读取帧元数据；只有 Debug build、用户主动点击后才复制一帧到私有 cache，不连续保存、不公开到相册，也不上传。
+- Screen Capture 只在 SamplingGate 接受后把 arena 复制进有界的进程内 buffer，不保存这些帧；只有 Debug build、用户主动点击后才额外保存一帧到私有 cache，不连续保存、不公开到相册，也不上传。
 - 没有对局持久化。Android 终止 CycleLens process 后，当前 MatchSession 和 Capture 状态会丢失。
 - 当前的“可用”是标准四卡循环距离，不声称精确恢复对手实时四张手牌。
 

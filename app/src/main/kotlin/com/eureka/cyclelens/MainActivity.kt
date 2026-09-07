@@ -19,6 +19,7 @@ import androidx.core.net.toUri
 import com.eureka.cyclelens.overlay.OverlayService
 import com.eureka.cyclelens.capture.CaptureService
 import com.eureka.cyclelens.capture.CaptureProfile
+import com.eureka.cyclelens.capture.AnalysisDelay
 import com.eureka.cyclelens.ui.CycleLensTheme
 import com.eureka.cyclelens.ui.CycleTrackerRoute
 
@@ -70,6 +71,7 @@ class MainActivity : ComponentActivity() {
                     overlayConfiguration = cycleLensApplication.overlayConfiguration,
                     captureState = cycleLensApplication.captureSessionState.state,
                     captureProfile = cycleLensApplication.captureConfiguration.profile,
+                    analysisDelay = cycleLensApplication.analysisConfiguration.delay,
                     debugSnapshotState = cycleLensApplication.captureDebugSnapshot.state,
                     overlayPermissionGranted = overlayPermissionGranted,
                     onEnableOverlayClick = ::openOverlayPermissionSettings,
@@ -77,6 +79,7 @@ class MainActivity : ComponentActivity() {
                     onStartCaptureClick = ::startCapture,
                     onStopCaptureClick = ::stopCapture,
                     onCaptureProfileChanged = ::setCaptureProfile,
+                    onAnalysisDelayChanged = ::setAnalysisDelay,
                     onSaveDebugFrameClick = ::saveDebugFrame,
                     onDeleteDebugFrameClick = ::deleteDebugFrame,
                 )
@@ -152,6 +155,12 @@ class MainActivity : ComponentActivity() {
     private fun saveDebugFrame() {
         if (BuildConfig.DEBUG) {
             CaptureService.saveDebugFrame(this)
+        }
+    }
+
+    private fun setAnalysisDelay(delay: AnalysisDelay) {
+        if (BuildConfig.DEBUG) {
+            cycleLensApplication.analysisConfiguration.setDelay(delay)
         }
     }
 

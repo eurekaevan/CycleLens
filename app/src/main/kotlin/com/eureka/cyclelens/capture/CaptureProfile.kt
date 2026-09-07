@@ -14,7 +14,7 @@ enum class CaptureProfile(
 }
 
 class CaptureConfiguration(
-    initialProfile: CaptureProfile = CaptureProfile.NATIVE,
+    initialProfile: CaptureProfile = CaptureProfile.BALANCED,
 ) {
     private val mutableProfile = kotlinx.coroutines.flow.MutableStateFlow(initialProfile)
     val profile: kotlinx.coroutines.flow.StateFlow<CaptureProfile> = mutableProfile

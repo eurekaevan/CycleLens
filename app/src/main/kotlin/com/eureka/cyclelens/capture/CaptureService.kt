@@ -49,6 +49,7 @@ class CaptureService : Service() {
     private var activeProfile = CaptureProfile.NATIVE
     private var activeGeometry: CaptureGeometry? = null
     private var samplingGate: FrameSamplingGate? = null
+    private var analysisPipeline: AnalysisFramePipeline? = null
     private var debugSnapshotNotBeforeNs: Long? = null
     private var publishedStatsCount = 0L
 
@@ -74,6 +75,9 @@ class CaptureService : Service() {
 
     private val publishStats = object : Runnable {
         override fun run() {
+            statsAccumulator?.setAnalysisStats(
+                analysisPipeline?.snapshot() ?: AnalysisPipelineStats(),
+            )
             val stats = statsAccumulator?.snapshot() ?: return
             captureState.publish(stats)
             publishedStatsCount += 1
@@ -82,7 +86,10 @@ class CaptureService : Service() {
                     "stats ${stats.width}x${stats.height}, " +
                         "received=${stats.receivedFrames}, accepted=${stats.acceptedFrames}, " +
                         "incomingFps=${"%.1f".format(stats.incomingFps)}, " +
-                        "acceptedFps=${"%.1f".format(stats.acceptedFps)}",
+                        "acceptedFps=${"%.1f".format(stats.acceptedFps)}, " +
+                        "copied=${stats.analysis.copiedFrames}, " +
+                        "processed=${stats.analysis.processedFrames}, " +
+                        "queueDrops=${stats.analysis.queueDrops}",
                 )
             }
             workerHandler.postDelayed(this, STATS_PUBLISH_INTERVAL_MS)
@@ -216,6 +223,13 @@ class CaptureService : Service() {
 
             activeGeometry = initialGeometry
             samplingGate = FrameSamplingGate(activeProfile.targetAnalysisFps)
+            val analysisConfiguration =
+                (application as CycleLensApplication).analysisConfiguration
+            analysisPipeline = AnalysisFramePipeline(
+                initialGeometry = initialGeometry,
+                processingDelayMs = { analysisConfiguration.delay.value.milliseconds },
+                checksumEnabled = isDebuggable(),
+            )
             val accumulator = CaptureStatsAccumulator(
                 initialGeometry = initialGeometry,
                 profile = activeProfile,
@@ -240,20 +254,29 @@ class CaptureService : Service() {
     }
 
     private fun createFrameOutput(size: CaptureSize): FrameOutput {
-        val reader = ImageReader.newInstance(
-            size.width,
-            size.height,
-            PixelFormat.RGBA_8888,
-            MAX_IMAGES,
-        )
-        val surface = reader.surface
-        val hintApplied = requestSurfaceFrameRateHint(surface)
-        val output = FrameOutput(reader, surface, hintApplied)
-        reader.setOnImageAvailableListener(
-            { availableReader -> onImageAvailable(availableReader) },
-            workerHandler,
-        )
-        return output
+        var reader: ImageReader? = null
+        var surface: Surface? = null
+        try {
+            reader = ImageReader.newInstance(
+                size.width,
+                size.height,
+                PixelFormat.RGBA_8888,
+                MAX_IMAGES,
+            )
+            surface = reader.surface
+            val hintApplied = requestSurfaceFrameRateHint(surface)
+            val output = FrameOutput(reader, surface, hintApplied)
+            reader.setOnImageAvailableListener(
+                { availableReader -> onImageAvailable(availableReader) },
+                workerHandler,
+            )
+            return output
+        } catch (error: RuntimeException) {
+            reader?.setOnImageAvailableListener(null, null)
+            reader?.close()
+            surface?.release()
+            throw error
+        }
     }
 
     private fun onImageAvailable(reader: ImageReader) {
@@ -282,18 +305,31 @@ class CaptureService : Service() {
             )
             val decision = samplingGate?.decide(image.timestamp) ?: FrameSamplingDecision.DROP
             statsAccumulator?.onFrame(metadata, accepted = decision == FrameSamplingDecision.ACCEPT)
-            maybeSaveDebugSnapshot(image)
             if (decision == FrameSamplingDecision.ACCEPT) {
-                activeGeometry?.let { geometry ->
-                    onAcceptedAnalysisFrame(
-                        AnalysisFrameDescriptor(
-                            timestampNs = image.timestamp,
-                            geometry = geometry,
-                            arenaRect = ClashRoyaleCaptureLayout.arenaRegion.toPixelRect(geometry),
-                        ),
+                val geometry = activeGeometry
+                val pipeline = analysisPipeline
+                val plane = image.planes.singleOrNull()
+                if (geometry != null && pipeline != null && plane != null) {
+                    val descriptor = AnalysisFrameDescriptor(
+                        timestampNs = image.timestamp,
+                        geometry = geometry,
+                        arenaRect = ClashRoyaleCaptureLayout.arenaRegion.toPixelRect(geometry),
                     )
+                    pipeline.submit(
+                        source = plane.buffer,
+                        sourceLayout = RgbaSourceLayout(
+                            width = image.width,
+                            height = image.height,
+                            pixelStride = plane.pixelStride,
+                            rowStride = plane.rowStride,
+                        ),
+                        descriptor = descriptor,
+                    )
+                } else {
+                    pipeline?.rejectUncopyableAcceptedFrame()
                 }
             }
+            maybeSaveDebugSnapshot(image)
         } catch (error: RuntimeException) {
             Log.e(TAG, "Unable to read capture frame metadata", error)
             metadataError = error
@@ -322,6 +358,7 @@ class CaptureService : Service() {
                 var newOutput: FrameOutput? = null
                 try {
                     newOutput = createFrameOutput(decision.next)
+                    analysisPipeline?.replaceGeometry(nextGeometry)
                     display.resize(
                         decision.next.width,
                         decision.next.height,
@@ -361,6 +398,9 @@ class CaptureService : Service() {
         }
 
         workerHandler.removeCallbacks(publishStats)
+        val closingPipeline = analysisPipeline
+        analysisPipeline = null
+        closingPipeline?.close()
         virtualDisplay?.release()
         virtualDisplay = null
         frameOutput?.close()
@@ -372,6 +412,16 @@ class CaptureService : Service() {
         samplingGate?.reset()
         samplingGate = null
         debugSnapshotNotBeforeNs = null
+        if (closingPipeline != null) {
+            if (!closingPipeline.awaitClosed(ANALYSIS_CLOSE_TIMEOUT_MS)) {
+                Log.w(TAG, "Timed out while waiting for analysis buffer release")
+            } else {
+                val shutdown = closingPipeline.shutdownState
+                if (shutdown == null || shutdown.queueSize != 0 || shutdown.currentPoolInUse != 0) {
+                    Log.e(TAG, "Analysis pipeline stopped with outstanding ownership: $shutdown")
+                }
+            }
+        }
 
         val projection = mediaProjection
         mediaProjection = null
@@ -481,11 +531,6 @@ class CaptureService : Service() {
             snapshotStore.delete()
             snapshotStore.failed("Debug frame could not be saved")
         }
-    }
-
-    private fun onAcceptedAnalysisFrame(descriptor: AnalysisFrameDescriptor) {
-        // Stage 6C boundary only. No Image or pixel buffer leaves the callback.
-        check(descriptor.timestampNs >= 0L)
     }
 
     private fun isDebuggable(): Boolean =
@@ -625,6 +670,7 @@ class CaptureService : Service() {
         private const val STATS_LOG_INTERVALS = 5L
         private const val OUTPUT_RETIRE_DELAY_MS = 250L
         private const val CLEANUP_TIMEOUT_SECONDS = 2L
+        private const val ANALYSIS_CLOSE_TIMEOUT_MS = 500L
         private const val DEBUG_SNAPSHOT_DELAY_NS = 2_000_000_000L
         private const val SURFACE_FRAME_RATE_HINT_FPS = 30f
         private const val SHOULD_REQUEST_SURFACE_FRAME_RATE_HINT = true

@@ -14,19 +14,20 @@ class FrameSamplingGate(
 
     val minimumIntervalNs: Long =
         (NANOS_PER_SECOND + targetAnalysisFps - 1L) / targetAnalysisFps
-    private var lastSeenTimestampNs: Long? = null
-    private var nextAcceptedTimestampNs: Long? = null
+    private var initialized = false
+    private var lastSeenTimestampNs = 0L
+    private var nextAcceptedTimestampNs = 0L
 
     fun decide(timestampNs: Long): FrameSamplingDecision {
         require(timestampNs >= 0L) { "Frame timestamp must not be negative" }
-        val lastSeen = lastSeenTimestampNs
-        if (lastSeen == null || timestampNs < lastSeen) {
+        if (!initialized || timestampNs < lastSeenTimestampNs) {
+            initialized = true
             lastSeenTimestampNs = timestampNs
             nextAcceptedTimestampNs = timestampNs.saturatedPlus(minimumIntervalNs)
             return FrameSamplingDecision.ACCEPT
         }
         lastSeenTimestampNs = timestampNs
-        val deadline = checkNotNull(nextAcceptedTimestampNs)
+        val deadline = nextAcceptedTimestampNs
         return if (timestampNs >= deadline) {
             var nextDeadline = deadline
             do {
@@ -40,8 +41,9 @@ class FrameSamplingGate(
     }
 
     fun reset() {
-        lastSeenTimestampNs = null
-        nextAcceptedTimestampNs = null
+        initialized = false
+        lastSeenTimestampNs = 0L
+        nextAcceptedTimestampNs = 0L
     }
 
     private fun Long.saturatedPlus(value: Long): Long =

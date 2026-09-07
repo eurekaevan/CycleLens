@@ -4,9 +4,9 @@
 
 ## 自动验证基线
 
-当前测试总数为 160：
+当前自动测试总数为 184：
 
-- 146 个 Kotlin/JVM 测试（`cycle-core` + Android app 的 JVM 可测状态/映射逻辑）；
+- 170 个 Kotlin/JVM 测试（`cycle-core` + Android app 的 JVM 可测状态/映射逻辑）；
 - 14 个 Python Catalog updater 测试。
 
 完整验收命令：
@@ -20,7 +20,35 @@
 git diff --check
 ```
 
-最近一次 Stage 6C 完整验收中，上述命令全部成功。WindowManager、MediaProjection 输出缩放和截图像素没有用 JVM mock 作为替代，而是在真机上验收。
+Stage 6D 的完整自动化命令、lint 和 Debug APK assemble/install 均已成功。WindowManager、MediaProjection 输出缩放和截图像素不以 JVM mock 替代真机结论。
+
+## Stage 6D analysis pipeline
+
+实现边界：accepted frame 在 ImageReader callback 内只复制 normalized arena，随后 `Image` 仍由原有 `finally` 关闭。输出是 tightly-packed RGBA direct buffer，不带原始 row padding；固定 pool 容量 3、latest queue 容量 1、overflow 为 `DROP_OLDEST`、worker 为单线程。
+
+Balanced arena 的静态内存预算：
+
+```text
+720 × 1186 × 4 = 3,415,680 bytes / buffer
+3 buffers         = 10,247,040 bytes total (about 9.77 MiB)
+queue capacity    = 1
+```
+
+纯 JVM 覆盖 pool exhaustion/reuse/stale lease/double release/dispose、queue overflow/drain/latest frame、padded row crop/exact bytes/invalid layout、worker success/exception/stop/resize、0/20/100 ms delay 与 pipeline timing/drop stats。真机 benchmark 数值只在完成实际 3–5 分钟采样后填写，不从单元测试推断。
+
+本阶段新增 24 个 JVM 测试。Samsung SM-S9260 / Android 16 使用 single-app Clash Royale、Balanced `720×1560` 进行真机验证。最终 direct-buffer、checksum 最多 1 Hz 的 0 ms session 连续约 3 分 55 秒：末段 incoming 约 107–116 FPS，accepted/copied/processed 均 15.0 FPS，3,528 accepted 全部处理，pool/queue/copy-format drop 均为 0。该轮末端 PSS 样本为 83,812 KB，thermal status 0；logcat 只看到一次由显式内存检查触发的 concurrent GC，没有持续 allocation GC、ImageReader/maxImages、BufferQueue abandoned、OOM 或 crash。
+
+真机 timing/pressure 数据来自同尺寸 direct pool。0/20/100 ms 是连续阶段，表内平均值用各阶段前后累计总数与累计平均反算；max 为该阶段观察到的新高。第一轮 debug build 曾每 processed frame 做稀疏 checksum，测得其约 0.43 ms/帧后，最终实现已限频为最多 1 Hz。
+
+| Delay | Accepted/copied | Processed | Queue drop | Pool miss | Copy avg/max | Processing avg/max | Queue avg/max |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 ms | 4,561 | 4,561 | 0 | 0 | 11.04 / 26.90 ms | 0.43 / 4.27 ms | 0.41 / 3.48 ms |
+| 20 ms | 4,615 | 4,615 | 0 | 0 | 11.86 / 26.90 ms | 20.77 / 24.11 ms | 0.39 / 11.28 ms |
+| 100 ms | 1,489 | 986 | 503 | 0 | 11.87 / 26.90 ms | 100.74 / 103.03 ms | 32.87 / 76.88 ms |
+
+100 ms 阶段约 99 秒内满足 `accepted = processed + queue drop`，queue capacity 始终为 1、pool in-use 不超过 2，最大 queue latency 76.88 ms，没有追赶数秒旧帧。正常 Stop 后 MediaProjection 为 null、CaptureService 消失，日志没有 analysis cleanup timeout。
+
+性能门槛尚未达到。最终 direct/0 ms build 的 Android `cpuinfo` 动态窗口约 38% app CPU，相对 Stage 6C capture-only 约 15% 明显过高；相同固定容量 heap 对照用 `/proc/<pid>/stat` 在 29.26 秒内测得约 39.3%，未改善。copy wall time 约 11–12 ms/accepted frame，是当前主要调查方向。PSS 与 thermal 达标，但在降低 strided arena copy 成本前，不进入 Stage 6E。没有进行 SurfaceFlinger frame timeline 或人工对局操作，因此本阶段不把“Clash Royale 无掉帧”标为已证明。
 
 ## Samsung Android 16 真机基线
 
@@ -96,4 +124,4 @@ left=0.000, top=0.095, right=1.000, bottom=0.855
 2. 在横竖屏间往返两次，确认 Balanced/Eco resize 后仍保持 profile-derived output。
 3. 从 Android 系统投屏 chip 停止，确认最终返回 Idle 并清理 service。
 4. 进行多局连续实战，并用 SurfaceFlinger/frame timeline 工具补充主观流畅度证据。
-5. 若 Stage 6D 需要像素 buffer，先单独设计 ownership、背压和内存上限；不得传递 callback-owned `Image`。
+5. Stage 6D 后续真机验收 0/20/100 ms pressure，确认 queue latency 有界、最终 queue=0，且没有 pool/ImageReader leak。

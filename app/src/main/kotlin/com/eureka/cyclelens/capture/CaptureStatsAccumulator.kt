@@ -25,6 +25,7 @@ internal class CaptureStatsAccumulator(
     private var rowStride: Int? = null
     private var pixelStride: Int? = null
     private var capturedContentVisible = true
+    private var analysis = AnalysisPipelineStats()
 
     @Synchronized
     override fun onFrame(frame: FrameMetadata) {
@@ -55,6 +56,11 @@ internal class CaptureStatsAccumulator(
     @Synchronized
     fun setCapturedContentVisible(visible: Boolean) {
         capturedContentVisible = visible
+    }
+
+    @Synchronized
+    fun setAnalysisStats(stats: AnalysisPipelineStats) {
+        analysis = stats
     }
 
     @Synchronized
@@ -92,6 +98,7 @@ internal class CaptureStatsAccumulator(
             capturedContentVisible = capturedContentVisible,
             surfaceFrameRateHintRequested = surfaceFrameRateHintRequested,
             surfaceFrameRateHintApplied = surfaceFrameRateHintApplied,
+            analysis = analysis,
         )
     }
 

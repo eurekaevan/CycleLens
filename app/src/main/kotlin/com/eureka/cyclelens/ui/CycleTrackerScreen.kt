@@ -62,6 +62,7 @@ import com.eureka.cyclelens.catalog.CardArtworkRepository
 import com.eureka.cyclelens.catalog.CardCatalog
 import com.eureka.cyclelens.capture.CaptureState
 import com.eureka.cyclelens.capture.CaptureProfile
+import com.eureka.cyclelens.capture.AnalysisDelay
 import com.eureka.cyclelens.capture.DebugSnapshotState
 import com.eureka.cyclelens.BuildConfig
 import com.eureka.cyclelens.overlay.OverlayBackgroundOpacity
@@ -84,6 +85,7 @@ fun CycleTrackerRoute(
     overlayConfiguration: OverlayConfiguration,
     captureState: StateFlow<CaptureState>,
     captureProfile: StateFlow<CaptureProfile>,
+    analysisDelay: StateFlow<AnalysisDelay>,
     debugSnapshotState: StateFlow<DebugSnapshotState>,
     overlayPermissionGranted: Boolean,
     onEnableOverlayClick: () -> Unit,
@@ -91,6 +93,7 @@ fun CycleTrackerRoute(
     onStartCaptureClick: () -> Unit,
     onStopCaptureClick: () -> Unit,
     onCaptureProfileChanged: (CaptureProfile) -> Unit,
+    onAnalysisDelayChanged: (AnalysisDelay) -> Unit,
     onSaveDebugFrameClick: () -> Unit,
     onDeleteDebugFrameClick: () -> Unit,
     trackerViewModel: CycleTrackerViewModel = viewModel(
@@ -105,6 +108,7 @@ fun CycleTrackerRoute(
     val state by trackerViewModel.uiState.collectAsStateWithLifecycle()
     val currentCaptureState by captureState.collectAsStateWithLifecycle()
     val currentCaptureProfile by captureProfile.collectAsStateWithLifecycle()
+    val currentAnalysisDelay by analysisDelay.collectAsStateWithLifecycle()
     val currentDebugSnapshotState by debugSnapshotState.collectAsStateWithLifecycle()
 
     CycleTrackerScreen(
@@ -112,6 +116,7 @@ fun CycleTrackerRoute(
         artworkRepository = artworkRepository,
         captureState = currentCaptureState,
         captureProfile = currentCaptureProfile,
+        analysisDelay = currentAnalysisDelay,
         debugSnapshotState = currentDebugSnapshotState,
         onTrackedCardClick = trackerViewModel::observeTrackedCard,
         onAddCardClick = trackerViewModel::openCardPicker,
@@ -135,6 +140,7 @@ fun CycleTrackerRoute(
         onStartCaptureClick = onStartCaptureClick,
         onStopCaptureClick = onStopCaptureClick,
         onCaptureProfileChanged = onCaptureProfileChanged,
+        onAnalysisDelayChanged = onAnalysisDelayChanged,
         onSaveDebugFrameClick = onSaveDebugFrameClick,
         onDeleteDebugFrameClick = onDeleteDebugFrameClick,
     )
@@ -146,6 +152,7 @@ fun CycleTrackerScreen(
     artworkRepository: CardArtworkRepository,
     captureState: CaptureState,
     captureProfile: CaptureProfile,
+    analysisDelay: AnalysisDelay,
     debugSnapshotState: DebugSnapshotState,
     onTrackedCardClick: (CardId) -> Unit,
     onAddCardClick: () -> Unit,
@@ -169,6 +176,7 @@ fun CycleTrackerScreen(
     onStartCaptureClick: () -> Unit,
     onStopCaptureClick: () -> Unit,
     onCaptureProfileChanged: (CaptureProfile) -> Unit,
+    onAnalysisDelayChanged: (AnalysisDelay) -> Unit,
     onSaveDebugFrameClick: () -> Unit,
     onDeleteDebugFrameClick: () -> Unit,
 ) {
@@ -202,10 +210,12 @@ fun CycleTrackerScreen(
             CaptureControl(
                 state = captureState,
                 profile = captureProfile,
+                analysisDelay = analysisDelay,
                 debugSnapshotState = debugSnapshotState,
                 onStartClick = onStartCaptureClick,
                 onStopClick = onStopCaptureClick,
                 onProfileChanged = onCaptureProfileChanged,
+                onAnalysisDelayChanged = onAnalysisDelayChanged,
                 onSaveDebugFrameClick = onSaveDebugFrameClick,
                 onDeleteDebugFrameClick = onDeleteDebugFrameClick,
             )
@@ -308,10 +318,12 @@ fun CycleTrackerScreen(
 private fun CaptureControl(
     state: CaptureState,
     profile: CaptureProfile,
+    analysisDelay: AnalysisDelay,
     debugSnapshotState: DebugSnapshotState,
     onStartClick: () -> Unit,
     onStopClick: () -> Unit,
     onProfileChanged: (CaptureProfile) -> Unit,
+    onAnalysisDelayChanged: (AnalysisDelay) -> Unit,
     onSaveDebugFrameClick: () -> Unit,
     onDeleteDebugFrameClick: () -> Unit,
 ) {
@@ -401,6 +413,21 @@ private fun CaptureControl(
             }
 
             if (BuildConfig.DEBUG) {
+                Text(
+                    text = stringResource(R.string.analysis_delay),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    AnalysisDelay.entries.forEach { option ->
+                        FilterChip(
+                            selected = analysisDelay == option,
+                            onClick = { onAnalysisDelayChanged(option) },
+                            label = {
+                                Text(stringResource(R.string.analysis_delay_value, option.milliseconds))
+                            },
+                        )
+                    }
+                }
                 OutlinedButton(
                     onClick = onSaveDebugFrameClick,
                     enabled = state is CaptureState.Running && !debugSnapshotState.pending,
@@ -438,6 +465,62 @@ private fun CaptureControl(
 private fun CaptureStatsContent(state: CaptureState.Running) {
     val stats = state.stats
     val unknown = stringResource(R.string.capture_value_unknown)
+    Text(
+        text = stringResource(
+            R.string.analysis_rates,
+            stats.analysis.copiedFps,
+            stats.analysis.processedFps,
+            stats.analysis.copiedFrames,
+            stats.analysis.processedFrames,
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(
+            R.string.analysis_drops,
+            stats.analysis.poolMissDrops,
+            stats.analysis.queueDrops,
+            stats.analysis.copyFailureDrops,
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(
+            R.string.analysis_timings,
+            stats.analysis.averageCopyTimeMs,
+            stats.analysis.maxCopyTimeMs,
+            stats.analysis.averageProcessingTimeMs,
+            stats.analysis.maxProcessingTimeMs,
+            stats.analysis.averageQueueLatencyMs,
+            stats.analysis.maxQueueLatencyMs,
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+        text = stringResource(
+            R.string.analysis_pool,
+            stats.analysis.poolAvailable,
+            stats.analysis.poolCapacity,
+            stats.analysis.poolInUse,
+            stats.analysis.queueSize,
+            stats.analysis.bufferByteSize,
+            stats.analysis.totalPoolByteSize,
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    if (BuildConfig.DEBUG) {
+        stats.analysis.lastDebugChecksum?.let { checksum ->
+            Text(
+                text = stringResource(R.string.analysis_checksum, checksum),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
     Text(
         text = stringResource(
             R.string.capture_source_output_size,

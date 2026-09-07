@@ -39,6 +39,13 @@
     <string name="capture_source_output_size">Source: %1$d × %2$d · Output: %3$d × %4$d</string>
     <string name="capture_fps">Incoming: %1$.1f FPS · Accepted: %2$.1f FPS\nAverage: %3$.1f / %4$.1f FPS</string>
     <string name="capture_frames">Frames: %1$d received · %2$d accepted · %3$d dropped</string>
+    <string name="analysis_rates">Copied: %1$.1f FPS · Processed: %2$.1f FPS\nTotals: %3$d copied · %4$d processed</string>
+    <string name="analysis_drops">Analysis drops: %1$d pool · %2$d queue · %3$d copy format</string>
+    <string name="analysis_timings">Copy avg/max: %1$.2f/%2$.2f ms\nProcess avg/max: %3$.2f/%4$.2f ms · Queue avg/max: %5$.2f/%6$.2f ms</string>
+    <string name="analysis_pool">Pool: %1$d/%2$d available · %3$d in use · queue %4$d\nBuffer: %5$d bytes · pool %6$d bytes</string>
+    <string name="analysis_checksum">Debug sparse checksum: %1$d</string>
+    <string name="analysis_delay">Debug analysis delay</string>
+    <string name="analysis_delay_value">%1$d ms</string>
     <string name="capture_visible">Visible: %1$s</string>
     <string name="capture_yes">Yes</string>
     <string name="capture_no">No</string>

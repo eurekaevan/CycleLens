@@ -36,6 +36,7 @@ data class CaptureStats(
     val capturedContentVisible: Boolean,
     val surfaceFrameRateHintRequested: Boolean,
     val surfaceFrameRateHintApplied: Boolean,
+    val analysis: AnalysisPipelineStats = AnalysisPipelineStats(),
 )
 
 internal sealed interface CaptureEvent {

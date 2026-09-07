@@ -7,6 +7,7 @@ import com.eureka.cyclelens.catalog.CardCatalog
 import com.eureka.cyclelens.capture.CaptureSessionStateStore
 import com.eureka.cyclelens.capture.CaptureConfiguration
 import com.eureka.cyclelens.capture.CaptureDebugSnapshotStore
+import com.eureka.cyclelens.capture.AnalysisConfiguration
 import com.eureka.cyclelens.overlay.OverlayConfiguration
 import com.eureka.cyclelens.overlay.OverlayQuickCards
 import com.eureka.cyclelens.session.MatchSession
@@ -15,6 +16,7 @@ class CycleLensApplication : Application() {
     val matchSession: MatchSession = MatchSession()
     val captureSessionState: CaptureSessionStateStore = CaptureSessionStateStore()
     val captureConfiguration: CaptureConfiguration = CaptureConfiguration()
+    val analysisConfiguration: AnalysisConfiguration = AnalysisConfiguration()
     lateinit var captureDebugSnapshot: CaptureDebugSnapshotStore
         private set
     lateinit var cardCatalog: CardCatalog
