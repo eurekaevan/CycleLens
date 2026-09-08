@@ -4,9 +4,9 @@
 
 ## 自动验证基线
 
-当前自动测试总数为 184：
+当前自动测试总数为 206：
 
-- 170 个 Kotlin/JVM 测试（`cycle-core` + Android app 的 JVM 可测状态/映射逻辑）；
+- 192 个 Kotlin/JVM 测试（`cycle-core` + Android app 的 JVM 可测状态/映射逻辑）；
 - 14 个 Python Catalog updater 测试。
 
 完整验收命令：
@@ -21,6 +21,42 @@ git diff --check
 ```
 
 Stage 6D 的完整自动化命令、lint 和 Debug APK assemble/install 均已成功。WindowManager、MediaProjection 输出缩放和截图像素不以 JVM mock 替代真机结论。
+
+## Stage 6E temporal event proposal
+
+实现范围仅为低分辨率时序变化候选：4× center-sample luma、绝对差分、8×8 coarse grid、8 邻域连通区域、bounded candidate selection，以及 normalized-IoU START/UPDATE/END grouping。它不包含卡牌分类、artwork/template、OCR、ML 或 `MatchSession.observe()`。luma/difference/grid 工作区在同 geometry 内复用；pipeline 仍拥有并最终释放原 RGBA lease。
+
+本阶段新增 22 个 JVM 测试，覆盖 luma/downsample 与 workspace reuse、threshold/difference、grid、global-change suppression、connected regions、deterministic truncation、portrait/landscape normalized bounds、IoU/cooldown/expiration/long-gap/reset，以及 analyzer 的 PROCESSING-only borrow、异常释放、完整 geometry 与 resize generation reset、candidate/event 聚合统计和 artificial-delay timing 分离。当前 192 个 JVM 测试与 14 个 updater 测试、lint 和 Debug APK assemble 均通过。
+
+### Samsung SM-S9260 / Android 16 验收
+
+最终 Debug APK 已安装。两轮均使用 single-app `RECORD_CONTENT_TASK`、Clash Royale target UID、Balanced `720×1560`、15 accepted FPS 和 0 ms artificial delay。系统状态确认 `mIsRecordingOverlay=false`。测试目标停留在游戏大厅动态画面；没有通过 ADB 自动出牌或操作对局。
+
+第一轮约 3.5 分钟累计 3,152 copied / 3,152 processed，pool、queue、copy-format drop 全为 0。12 个相隔约 10 秒的 `top` 样本为 48.1–66.6%，平均约 59.7%，其中 6 个样本不低于 60%。第二轮最终计数 build 的 6 个样本平均约 58.0%；去掉启动首个 35.7% 样本后，其余 5 个稳态样本平均约 62.5%。这已触及 Stage 6E 的 60–70% 暂停线，因此不继续增加算法复杂度。
+
+最终 session 统计：
+
+| 项目 | Avg / max 或累计 |
+| --- | ---: |
+| Accepted/copied/processed | 1,397 / 1,397 / 1,397 |
+| Pool / queue / copy-format drops | 0 / 0 / 0 |
+| Copy | 9.88 / 17.36 ms |
+| Queue latency | 0.40 / 4.43 ms |
+| Luma/downsample | 12.93 / 30.05 ms |
+| Difference | 0.71 / 35.22 ms |
+| Grid aggregation | 0.81 / 16.50 ms |
+| Candidate extraction | 0.09 / 10.13 ms |
+| Temporal grouping | 0.11 / 0.58 ms |
+| Total analyzer | 14.69 / 79.44 ms |
+| Candidates/frame | 0.89 avg / 8 max |
+| Frames with candidates | 831 / 1,397 (59.5%) |
+| START / UPDATE / END | 380 / 857 / 408 |
+
+最终可比 PSS 在 Clash Royale 前台、CycleLens Activity 隐藏时为 93,356 KB；Activity 前台渲染完整 Catalog UI 时的 173,404 KB 不作为 capture PSS。两轮 thermal status 均为 0。日志未发现 app PID 的 FATAL/OOM、ImageReader maxImages、BufferQueue abandoned 或 analysis cleanup timeout；显式 `dumpsys meminfo` 触发过一次 concurrent GC，不代表持续 per-frame allocation GC。正常 Stop 后 MediaProjection 为 null，CaptureService 消失。
+
+大厅并非 calibrated battle arena，因此这些候选不能用于计算 deployment recall。但在该低交互、仍有 UI animation 的画面上，59.5% 帧有候选且约产生 4.1 个 START/秒，说明 naive temporal difference 对非战斗动画仍较敏感。它能把整帧变化压缩到平均少于 1 个 bounded region，但当前 CPU 和 false-start 证据都不支持直接进入 classification。
+
+未验证项：真实 troop/building deployment、Fireball/Arrows/Zap/Log、现存单位移动、projectile、塔攻击、troop death，以及 Clash Royale 人工 frame-pacing。Stage 6E 明确禁止自动游戏操作，本轮没有用户手动对局输入，因此不以大厅数据替代这些结论。下一步应先降低 luma/downsample 和已有 arena copy 成本，并在用户手动对局下采样真实候选，再决定 event proposal 方法；当前不建议进入 candidate classification。
 
 ## Stage 6D analysis pipeline
 
@@ -40,7 +76,7 @@ queue capacity    = 1
 
 真机 timing/pressure 数据来自同尺寸 direct pool。0/20/100 ms 是连续阶段，表内平均值用各阶段前后累计总数与累计平均反算；max 为该阶段观察到的新高。第一轮 debug build 曾每 processed frame 做稀疏 checksum，测得其约 0.43 ms/帧后，最终实现已限频为最多 1 Hz。
 
-| Delay | Accepted/copied | Processed | Queue drop | Pool miss | Copy avg/max | Processing avg/max | Queue avg/max |
+| Delay | Accepted/copied | Processed | Queue drop | Pool miss | Copy avg/max | Historical worker avg/max (included delay) | Queue avg/max |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 0 ms | 4,561 | 4,561 | 0 | 0 | 11.04 / 26.90 ms | 0.43 / 4.27 ms | 0.41 / 3.48 ms |
 | 20 ms | 4,615 | 4,615 | 0 | 0 | 11.86 / 26.90 ms | 20.77 / 24.11 ms | 0.39 / 11.28 ms |
@@ -48,7 +84,7 @@ queue capacity    = 1
 
 100 ms 阶段约 99 秒内满足 `accepted = processed + queue drop`，queue capacity 始终为 1、pool in-use 不超过 2，最大 queue latency 76.88 ms，没有追赶数秒旧帧。正常 Stop 后 MediaProjection 为 null、CaptureService 消失，日志没有 analysis cleanup timeout。
 
-性能门槛尚未达到。最终 direct/0 ms build 的 Android `cpuinfo` 动态窗口约 38% app CPU，相对 Stage 6C capture-only 约 15% 明显过高；相同固定容量 heap 对照用 `/proc/<pid>/stat` 在 29.26 秒内测得约 39.3%，未改善。copy wall time 约 11–12 ms/accepted frame，是当前主要调查方向。PSS 与 thermal 达标，但在降低 strided arena copy 成本前，不进入 Stage 6E。没有进行 SurfaceFlinger frame timeline 或人工对局操作，因此本阶段不把“Clash Royale 无掉帧”标为已证明。
+性能门槛尚未达到。最终 direct/0 ms build 的 Android `cpuinfo` 动态窗口约 38% app CPU，相对 Stage 6C capture-only 约 15% 明显过高；相同固定容量 heap 对照用 `/proc/<pid>/stat` 在 29.26 秒内测得约 39.3%，未改善。copy wall time 约 11–12 ms/accepted frame，是当前主要调查方向。PSS 与 thermal 达标；Stage 6E 的纯实现后来被明确授权继续，但仍需在进入 classification 前补做真机性能和候选有效性验收。没有进行 SurfaceFlinger frame timeline 或人工对局操作，因此本阶段不把“Clash Royale 无掉帧”标为已证明。
 
 ## Samsung Android 16 真机基线
 

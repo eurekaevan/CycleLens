@@ -26,6 +26,7 @@ internal class AnalysisFramePipeline(
     private val checksumEnabled: Boolean,
     private val clock: NanoClock = NanoClock(System::nanoTime),
     private val sleeper: FrameSleeper = FrameSleeper(Thread::sleep),
+    private val analyzer: FrameAnalyzer = TemporalEventAnalyzer(clock = clock),
     private val poolCapacity: Int = FrameBufferPool.DEFAULT_CAPACITY,
     private val queueCapacity: Int = AnalysisFrameQueue.DEFAULT_CAPACITY,
 ) : AutoCloseable {
@@ -43,6 +44,7 @@ internal class AnalysisFramePipeline(
     @Volatile var shutdownState: AnalysisPipelineShutdownState? = null
         private set
     private var nextChecksumAtNs = 0L
+    private var analyzedPool: FrameBufferPool? = null
 
     fun submit(
         source: ByteBuffer,
@@ -151,23 +153,44 @@ internal class AnalysisFramePipeline(
             }
             val processingStartedNs = clock.now()
             stats.onDequeued((processingStartedNs - frame.enqueuedAtNs).coerceAtLeast(0L))
+            var actualProcessingNs = 0L
+            var configuredDelayMs = 0L
+            var analysisCompleted = false
             try {
-                val delay = processingDelayMs().coerceAtLeast(0L)
-                if (delay > 0L) sleeper.sleep(delay)
-                val afterDelayNs = clock.now()
-                val checksum = if (checksumEnabled && afterDelayNs >= nextChecksumAtNs) {
-                    nextChecksumAtNs = afterDelayNs.saturatedPlus(CHECKSUM_INTERVAL_NS)
+                if (analyzedPool !== frame.pool) {
+                    analyzer.reset()
+                    analyzedPool = frame.pool
+                }
+                val result = analyzer.analyze(frame)
+                val afterAnalysisNs = clock.now()
+                val checksum = if (checksumEnabled && afterAnalysisNs >= nextChecksumAtNs) {
+                    nextChecksumAtNs = afterAnalysisNs.saturatedPlus(CHECKSUM_INTERVAL_NS)
                     sparseChecksum(frame.readOnlyPixels())
                 } else {
                     null
                 }
-                stats.onProcessed(clock.now() - processingStartedNs, checksum)
+                actualProcessingNs = (clock.now() - processingStartedNs).coerceAtLeast(0L)
+                analysisCompleted = true
+                configuredDelayMs = processingDelayMs().coerceAtLeast(0L)
+                if (configuredDelayMs > 0L) sleeper.sleep(configuredDelayMs)
+                stats.onProcessed(
+                    durationNs = actualProcessingNs,
+                    checksum = checksum,
+                    artificialDelayMs = configuredDelayMs,
+                    result = result,
+                )
             } catch (_: InterruptedException) {
                 Thread.currentThread().interrupt()
-                stats.onProcessingError(clock.now() - processingStartedNs)
+                stats.onProcessingError(
+                    durationNs = if (analysisCompleted) actualProcessingNs else clock.now() - processingStartedNs,
+                    artificialDelayMs = configuredDelayMs,
+                )
                 return
             } catch (_: RuntimeException) {
-                stats.onProcessingError(clock.now() - processingStartedNs)
+                stats.onProcessingError(
+                    durationNs = if (analysisCompleted) actualProcessingNs else clock.now() - processingStartedNs,
+                    artificialDelayMs = configuredDelayMs,
+                )
             } finally {
                 frame.release()
             }

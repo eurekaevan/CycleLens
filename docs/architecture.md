@@ -1,6 +1,6 @@
 # CycleLens 架构
 
-本文档描述当前已实现的 Stage 6D 边界。核心原则是：牌序、展示资料、Overlay、采集几何和帧获取各自只有一个权威数据源。
+本文档描述当前已实现的 Stage 6E 边界。核心原则是：牌序、展示资料、Overlay、采集几何和帧获取各自只有一个权威数据源。
 
 ## 总览
 
@@ -131,7 +131,7 @@ Image plane + padded rowStride
   → 同步复制 arena 到 tightly-packed RGBA OwnedFrameBuffer
   → capacity-1 DROP_OLDEST queue
   → single analysis worker
-  → debug sparse checksum / timing
+  → reusable low-resolution luma / temporal EventCandidate
   → release 回固定 pool
 ```
 
@@ -155,6 +155,20 @@ resize 会先建立新尺寸 generation，清空并归还旧 queued buffers，�
 
 Debug build 可动态注入 0/20/50/100 ms worker delay，并显示不可逆的稀疏 64-bit checksum；Release UI 不包含这些入口。checksum 最多每秒计算一次，不保存 pixels、不联网，也不用于识别。
 
+## Temporal change analysis
+
+`FrameAnalyzer` 是同步借用边界：pipeline 只在 `OwnedFrameBuffer` 为 `PROCESSING` 时调用 analyzer，返回后无论成功或异常都由 pipeline 的 `finally` 释放 lease。analyzer 不缓存 frame、`ByteBuffer` 或异步任务。每个 capture session 创建独立 analyzer；worker 发现 pool generation 改变时先 reset，因此 resize 后第一帧只建立新 baseline，不会和旧 geometry 做差分。
+
+当前 `TemporalEventAnalyzer` 直接从 tightly-packed arena RGBA 读取每个 4×4 block 的中心样本，用 `(77R + 150G + 29B) >> 8` 生成 luma。Balanced `720×1186` arena 对应 `180×297` analysis plane。previous/current luma、difference mask、cell counters、visited flags 和 traversal queue 都按 geometry 一次分配并复用；没有第二份 full-resolution RGBA 或 per-frame Bitmap。
+
+默认差分阈值为 24。difference 再聚合到 8×8 analysis-pixel cell：changed ratio 至少 0.18 且全 cell mean difference 至少 10 才 active；全画面 changed ratio 达 0.75 时抑制该帧候选，避免亮度切换形成 flood。active cells 以 8 邻域连接，少于 2 cells 的 component 被过滤。候选按 strength、changed ratio、位置确定性排序，并在提取过程中始终只保留前 8 个。
+
+`EventCandidate.bounds` 是完整 capture output 的 normalized coordinates，不是 arena-local pixels；因此 portrait/landscape 都通过 descriptor geometry 与 arena offset 映射。候选只表达“这里出现显著变化”，不带 `CardId`、visual form 或卡牌 identity confidence。
+
+`TemporalChangeTracker` 用 normalized IoU 0.20 做轻量 START/UPDATE/END grouping。track 350 ms 未重叠即 END，700 ms cooldown 内重新重叠仍归入同一 episode；候选每帧最多 8 个，保留 track 最多 16 个。它跟踪的是变化区域而非 troop/card object。
+
+stats 分别累计 luma、difference、grid aggregation、candidate extraction、temporal grouping 和 analyzer total 的 avg/max。0/20/50/100 ms artificial delay 在 analyzer 之后执行并单独显示，不计入 actual processing/analyzer timing。UI 仍只每秒发布一次 bounded metadata；Debug panel 可见候选数、active tracks、normalized x/y/w/h、strength 和 age，游戏上的 `TYPE_APPLICATION_OVERLAY` 不绘制分析框。
+
 ## Debug-only 单帧快照
 
 Debug UI 的按钮只在 Running 时可用。用户点击后武装一次请求，并给出 2 秒切回捕获目标的时间；下一张符合时间条件的 frame 才会逐行复制为一张 PNG。转换使用 plane `rowStride`/`pixelStride`，每行只复制可见的 `width * 4` bytes，因此 Samsung 的 5888-byte padded rows 不会污染下一行。
@@ -165,7 +179,7 @@ CaptureService 使用 `mediaProjection` foreground service type 和 `START_NOT_S
 
 ## 保持不变的扩展边界
 
-未来引入视觉处理时，应继续遵守：
+未来引入候选分类时，应继续遵守：
 
 - 帧处理输出 canonical/visual form ID，不把牌名或 artwork 塞入 Core。
 - 识别结果不得绕过明确的决策边界直接篡改 MatchSession。

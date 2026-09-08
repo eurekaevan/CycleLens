@@ -64,6 +64,7 @@ import com.eureka.cyclelens.capture.CaptureState
 import com.eureka.cyclelens.capture.CaptureProfile
 import com.eureka.cyclelens.capture.AnalysisDelay
 import com.eureka.cyclelens.capture.DebugSnapshotState
+import com.eureka.cyclelens.capture.TemporalChangePhase
 import com.eureka.cyclelens.BuildConfig
 import com.eureka.cyclelens.overlay.OverlayBackgroundOpacity
 import com.eureka.cyclelens.overlay.OverlayConfiguration
@@ -513,6 +514,80 @@ private fun CaptureStatsContent(state: CaptureState.Running) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     if (BuildConfig.DEBUG) {
+        Text(
+            text = stringResource(
+                R.string.analysis_stage_timings_primary,
+                stats.analysis.analyzerTimings.luma.averageMs,
+                stats.analysis.analyzerTimings.luma.maxMs,
+                stats.analysis.analyzerTimings.difference.averageMs,
+                stats.analysis.analyzerTimings.difference.maxMs,
+                stats.analysis.analyzerTimings.gridAggregation.averageMs,
+                stats.analysis.analyzerTimings.gridAggregation.maxMs,
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = stringResource(
+                R.string.analysis_stage_timings_secondary,
+                stats.analysis.analyzerTimings.candidateExtraction.averageMs,
+                stats.analysis.analyzerTimings.candidateExtraction.maxMs,
+                stats.analysis.analyzerTimings.temporalGrouping.averageMs,
+                stats.analysis.analyzerTimings.temporalGrouping.maxMs,
+                stats.analysis.analyzerTimings.total.averageMs,
+                stats.analysis.analyzerTimings.total.maxMs,
+                stats.analysis.artificialDelayMs,
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        stats.analysis.latestAnalysis?.let { analysis ->
+            Text(
+                text = stringResource(
+                    R.string.analysis_candidates_summary,
+                    analysis.candidates.size,
+                    analysis.activeTrackCount,
+                    analysis.analysisWidth,
+                    analysis.analysisHeight,
+                    stats.analysis.averageCandidatesPerFrame,
+                    stats.analysis.maxCandidatesPerFrame,
+                    stats.analysis.candidateFrames,
+                    stats.analysis.analysisResultFrames,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            analysis.events.filter { it.phase != TemporalChangePhase.END }
+                .forEach { event ->
+                    val bounds = event.candidate.bounds
+                    Text(
+                        text = stringResource(
+                            R.string.analysis_candidate,
+                            event.trackId,
+                            event.phase.name,
+                            bounds.left,
+                            bounds.top,
+                            bounds.right - bounds.left,
+                            bounds.bottom - bounds.top,
+                            event.candidate.strength,
+                            event.candidate.changedAreaRatio,
+                            event.ageFrames,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+        }
+        Text(
+            text = stringResource(
+                R.string.analysis_event_totals,
+                stats.analysis.startEvents,
+                stats.analysis.updateEvents,
+                stats.analysis.endEvents,
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         stats.analysis.lastDebugChecksum?.let { checksum ->
             Text(
                 text = stringResource(R.string.analysis_checksum, checksum),

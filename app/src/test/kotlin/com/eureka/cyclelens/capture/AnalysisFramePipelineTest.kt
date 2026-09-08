@@ -4,6 +4,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -91,6 +92,69 @@ class AnalysisFramePipelineTest {
     }
 
     @Test
+    fun `analyzer exception records error and releases processing lease`() {
+        val pipeline = AnalysisFramePipeline(
+            initialGeometry = geometry(),
+            processingDelayMs = { 0 },
+            checksumEnabled = false,
+            analyzer = FrameAnalyzer { error("synthetic analyzer failure") },
+        )
+
+        pipeline.submit(source(), layout(), descriptor(timestamp = 1))
+
+        val stats = pipeline.awaitStats { it.processingErrors == 1L }
+        assertEquals(1, stats.processedFrames)
+        assertEquals(3, stats.poolAvailable)
+        pipeline.close()
+    }
+
+    @Test
+    fun `analyzer borrows processing frame and pipeline releases it`() {
+        val borrowed = AtomicReference<OwnedFrameBuffer>()
+        val pipeline = AnalysisFramePipeline(
+            initialGeometry = geometry(),
+            processingDelayMs = { 0 },
+            checksumEnabled = false,
+            analyzer = FrameAnalyzer { frame ->
+                assertEquals(FrameBufferOwnership.PROCESSING, frame.ownership)
+                frame.readOnlyPixels().get(0)
+                borrowed.set(frame)
+                emptyResult(frame.descriptor.timestampNs)
+            },
+        )
+
+        pipeline.submit(source(), layout(), descriptor(timestamp = 1))
+
+        pipeline.awaitStats { it.processedFrames == 1L }
+        assertEquals(FrameBufferOwnership.RELEASED, borrowed.get().ownership)
+        kotlin.test.assertFailsWith<IllegalStateException> { borrowed.get().readOnlyPixels() }
+        pipeline.close()
+    }
+
+    @Test
+    fun `artificial delay is excluded from actual processing timing`() {
+        val clock = AdvancingClock()
+        val pipeline = AnalysisFramePipeline(
+            initialGeometry = geometry(),
+            processingDelayMs = { 100 },
+            checksumEnabled = false,
+            clock = clock,
+            sleeper = FrameSleeper { clock.advance(it * 1_000_000) },
+            analyzer = FrameAnalyzer { frame ->
+                clock.advance(3_000_000)
+                emptyResult(frame.descriptor.timestampNs)
+            },
+        )
+
+        pipeline.submit(source(), layout(), descriptor(timestamp = 1))
+
+        val stats = pipeline.awaitStats { it.processedFrames == 1L }
+        assertEquals(3f, stats.averageProcessingTimeMs)
+        assertEquals(100, stats.artificialDelayMs)
+        pipeline.close()
+    }
+
+    @Test
     fun `resize drains old queue and creates correctly sized generation`() {
         val processingStarted = CountDownLatch(1)
         val releaseProcessing = CountDownLatch(1)
@@ -118,6 +182,39 @@ class AnalysisFramePipelineTest {
         releaseProcessing.countDown()
         pipeline.close()
         assertTrue(pipeline.awaitClosed(500))
+    }
+
+    @Test
+    fun `worker resets analyzer when resize changes pool generation`() {
+        val resetCount = AtomicLong()
+        val analyzer = object : FrameAnalyzer {
+            override fun analyze(frame: OwnedFrameBuffer) = emptyResult(frame.descriptor.timestampNs)
+            override fun reset() {
+                resetCount.incrementAndGet()
+            }
+        }
+        val pipeline = AnalysisFramePipeline(
+            initialGeometry = geometry(),
+            processingDelayMs = { 0 },
+            checksumEnabled = false,
+            analyzer = analyzer,
+        )
+        pipeline.submit(source(), layout(), descriptor(timestamp = 1))
+        pipeline.awaitStats { it.processedFrames == 1L }
+        assertEquals(1, resetCount.get())
+
+        val landscape = CaptureGeometry(200, 100, 200, 100)
+        val arena = ClashRoyaleCaptureLayout.arenaRegion.toPixelRect(landscape)
+        pipeline.replaceGeometry(landscape)
+        pipeline.submit(
+            source = ByteBuffer.allocate(200 * 100 * 4),
+            sourceLayout = RgbaSourceLayout(200, 100, 4, 800),
+            descriptor = AnalysisFrameDescriptor(2, landscape, arena),
+        )
+
+        pipeline.awaitStats { it.processedFrames == 2L }
+        assertEquals(2, resetCount.get())
+        pipeline.close()
     }
 
     @Test
@@ -189,6 +286,24 @@ class AnalysisFramePipelineTest {
     private fun source() = ByteBuffer.allocate(40_000).apply {
         repeat(capacity()) { put((it and 0xff).toByte()) }
         flip()
+    }
+
+    private fun emptyResult(timestampNs: Long) = AnalysisResult(
+        timestampNs = timestampNs,
+        analysisWidth = 1,
+        analysisHeight = 1,
+        candidates = emptyList(),
+        events = emptyList(),
+        activeTrackCount = 0,
+        timings = AnalyzerStageTimingsNs(),
+    )
+
+    private class AdvancingClock : NanoClock {
+        private val value = AtomicLong()
+        override fun now(): Long = value.get()
+        fun advance(nanoseconds: Long) {
+            value.addAndGet(nanoseconds)
+        }
     }
 
     private fun AnalysisFramePipeline.awaitStats(

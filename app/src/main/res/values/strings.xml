@@ -44,6 +44,11 @@
     <string name="analysis_timings">Copy avg/max: %1$.2f/%2$.2f ms\nProcess avg/max: %3$.2f/%4$.2f ms · Queue avg/max: %5$.2f/%6$.2f ms</string>
     <string name="analysis_pool">Pool: %1$d/%2$d available · %3$d in use · queue %4$d\nBuffer: %5$d bytes · pool %6$d bytes</string>
     <string name="analysis_checksum">Debug sparse checksum: %1$d</string>
+    <string name="analysis_stage_timings_primary">Analyzer avg/max ms: luma %1$.2f/%2$.2f · diff %3$.2f/%4$.2f · grid %5$.2f/%6$.2f</string>
+    <string name="analysis_stage_timings_secondary">Regions %1$.2f/%2$.2f · tracking %3$.2f/%4$.2f · total %5$.2f/%6$.2f · artificial delay %7$d ms</string>
+    <string name="analysis_candidates_summary">Candidates now: %1$d · active tracks: %2$d · luma: %3$d×%4$d\nCandidates avg/max: %5$.2f/%6$d · active frames: %7$d/%8$d</string>
+    <string name="analysis_event_totals">Track events: %1$d start · %2$d update · %3$d end</string>
+    <string name="analysis_candidate">Track %1$d %2$s · x/y/w/h %3$.3f/%4$.3f/%5$.3f/%6$.3f · strength %7$.3f · changed %8$.3f · age %9$d</string>
     <string name="analysis_delay">Debug analysis delay</string>
     <string name="analysis_delay_value">%1$d ms</string>
     <string name="capture_visible">Visible: %1$s</string>

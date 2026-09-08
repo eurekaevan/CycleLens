@@ -1,5 +1,19 @@
 package com.eureka.cyclelens.capture
 
+data class TimingStats(
+    val averageMs: Float = 0f,
+    val maxMs: Float = 0f,
+)
+
+data class AnalyzerTimingStats(
+    val luma: TimingStats = TimingStats(),
+    val difference: TimingStats = TimingStats(),
+    val gridAggregation: TimingStats = TimingStats(),
+    val candidateExtraction: TimingStats = TimingStats(),
+    val temporalGrouping: TimingStats = TimingStats(),
+    val total: TimingStats = TimingStats(),
+)
+
 data class AnalysisPipelineStats(
     val acceptedFrames: Long = 0,
     val copiedFrames: Long = 0,
@@ -23,6 +37,17 @@ data class AnalysisPipelineStats(
     val bufferByteSize: Int = 0,
     val totalPoolByteSize: Long = 0,
     val lastDebugChecksum: Long? = null,
+    val artificialDelayMs: Long = 0L,
+    val analyzerTimings: AnalyzerTimingStats = AnalyzerTimingStats(),
+    val latestAnalysis: AnalysisResult? = null,
+    val analysisResultFrames: Long = 0L,
+    val candidateFrames: Long = 0L,
+    val totalCandidates: Long = 0L,
+    val averageCandidatesPerFrame: Float = 0f,
+    val maxCandidatesPerFrame: Int = 0,
+    val startEvents: Long = 0L,
+    val updateEvents: Long = 0L,
+    val endEvents: Long = 0L,
 )
 
 internal class AnalysisPipelineStatsAccumulator(
@@ -46,6 +71,16 @@ internal class AnalysisPipelineStatsAccumulator(
     private var processedAtLastSnapshot = 0L
     private var lastSnapshotNs = clock.now()
     private var lastDebugChecksum: Long? = null
+    private var artificialDelayMs = 0L
+    private var latestAnalysis: AnalysisResult? = null
+    private var analysisResultFrames = 0L
+    private var candidateFrames = 0L
+    private var totalCandidates = 0L
+    private var maxCandidatesPerFrame = 0
+    private var startEvents = 0L
+    private var updateEvents = 0L
+    private var endEvents = 0L
+    private val analyzerTimings = AnalyzerTimingAccumulator()
 
     @Synchronized fun onAccepted() { acceptedFrames++ }
     @Synchronized fun onPoolMiss() { poolMissDrops++ }
@@ -73,18 +108,42 @@ internal class AnalysisPipelineStatsAccumulator(
     }
 
     @Synchronized
-    fun onProcessed(durationNs: Long, checksum: Long?) {
+    fun onProcessed(
+        durationNs: Long,
+        checksum: Long?,
+        artificialDelayMs: Long? = null,
+        result: AnalysisResult? = null,
+    ) {
         processedFrames++
         val safe = durationNs.coerceAtLeast(0L)
         processingTimeNs += safe
         maxProcessingTimeNs = maxOf(maxProcessingTimeNs, safe)
+        if (artificialDelayMs != null) {
+            this.artificialDelayMs = artificialDelayMs.coerceAtLeast(0L)
+        }
         if (checksum != null) lastDebugChecksum = checksum
+        if (result != null) {
+            latestAnalysis = result
+            analyzerTimings.add(result.timings)
+            analysisResultFrames++
+            val candidateCount = result.candidates.size
+            totalCandidates += candidateCount
+            if (candidateCount > 0) candidateFrames++
+            maxCandidatesPerFrame = maxOf(maxCandidatesPerFrame, candidateCount)
+            result.events.forEach { event ->
+                when (event.phase) {
+                    TemporalChangePhase.START -> startEvents++
+                    TemporalChangePhase.UPDATE -> updateEvents++
+                    TemporalChangePhase.END -> endEvents++
+                }
+            }
+        }
     }
 
     @Synchronized
-    fun onProcessingError(durationNs: Long) {
+    fun onProcessingError(durationNs: Long, artificialDelayMs: Long? = null) {
         processingErrors++
-        onProcessed(durationNs, checksum = null)
+        onProcessed(durationNs, checksum = null, artificialDelayMs = artificialDelayMs)
     }
 
     @Synchronized
@@ -122,6 +181,18 @@ internal class AnalysisPipelineStatsAccumulator(
             bufferByteSize = pool?.bufferByteSize ?: 0,
             totalPoolByteSize = pool?.totalByteSize ?: 0,
             lastDebugChecksum = lastDebugChecksum,
+            artificialDelayMs = artificialDelayMs,
+            analyzerTimings = analyzerTimings.snapshot(),
+            latestAnalysis = latestAnalysis,
+            analysisResultFrames = analysisResultFrames,
+            candidateFrames = candidateFrames,
+            totalCandidates = totalCandidates,
+            averageCandidatesPerFrame = if (analysisResultFrames == 0L) 0f else
+                totalCandidates.toFloat() / analysisResultFrames,
+            maxCandidatesPerFrame = maxCandidatesPerFrame,
+            startEvents = startEvents,
+            updateEvents = updateEvents,
+            endEvents = endEvents,
         )
     }
 
@@ -136,5 +207,53 @@ internal class AnalysisPipelineStatsAccumulator(
     private companion object {
         const val NANOS_PER_SECOND = 1_000_000_000.0
         const val NANOS_PER_MILLISECOND = 1_000_000.0
+    }
+
+    private class AnalyzerTimingAccumulator {
+        private var samples = 0L
+        private val sums = LongArray(STAGE_COUNT)
+        private val maxima = LongArray(STAGE_COUNT)
+
+        fun add(timings: AnalyzerStageTimingsNs) {
+            samples++
+            add(LUMA, timings.luma)
+            add(DIFFERENCE, timings.difference)
+            add(GRID, timings.gridAggregation)
+            add(EXTRACTION, timings.candidateExtraction)
+            add(TRACKING, timings.temporalGrouping)
+            add(TOTAL, timings.total)
+        }
+
+        fun snapshot(): AnalyzerTimingStats = AnalyzerTimingStats(
+            luma = timing(LUMA),
+            difference = timing(DIFFERENCE),
+            gridAggregation = timing(GRID),
+            candidateExtraction = timing(EXTRACTION),
+            temporalGrouping = timing(TRACKING),
+            total = timing(TOTAL),
+        )
+
+        private fun timing(index: Int) = TimingStats(
+            averageMs = if (samples == 0L) 0f else
+                (sums[index].toDouble() / samples / NANOS_PER_MILLISECOND).toFloat(),
+            maxMs = (maxima[index].toDouble() / NANOS_PER_MILLISECOND).toFloat(),
+        )
+
+        private fun add(index: Int, value: Long) {
+            val safe = value.coerceAtLeast(0L)
+            sums[index] += safe
+            maxima[index] = maxOf(maxima[index], safe)
+        }
+
+        private companion object {
+            const val LUMA = 0
+            const val DIFFERENCE = 1
+            const val GRID = 2
+            const val EXTRACTION = 3
+            const val TRACKING = 4
+            const val TOTAL = 5
+            const val STAGE_COUNT = 6
+            const val NANOS_PER_MILLISECOND = 1_000_000.0
+        }
     }
 }
