@@ -861,6 +861,16 @@
       "include": true
     },
     {
+      "id": "minion_giant",
+      "supercellId": 26000107,
+      "upstreamName": "Minion Giant",
+      "shortName": "Minion G",
+      "type": "TROOP",
+      "elixir": 4,
+      "cycleEligible": true,
+      "include": true
+    },
+    {
       "id": "cannon",
       "supercellId": 27000000,
       "upstreamName": "Cannon",
@@ -1533,6 +1543,12 @@
       "displayName": "Ice Wizard"
     },
     {
+      "id": "hero_ice_wizard",
+      "canonicalCardId": "ice_wizard",
+      "form": "HERO",
+      "displayName": "Hero Ice Wizard"
+    },
+    {
       "id": "royal_giant_normal",
       "canonicalCardId": "royal_giant",
       "form": "NORMAL",
@@ -1711,6 +1727,12 @@
       "canonicalCardId": "electro_wizard",
       "form": "NORMAL",
       "displayName": "Electro Wizard"
+    },
+    {
+      "id": "hero_electro_wizard",
+      "canonicalCardId": "electro_wizard",
+      "form": "HERO",
+      "displayName": "Hero Electro Wizard"
     },
     {
       "id": "elite_barbarians_normal",
@@ -1995,6 +2017,12 @@
       "displayName": "Electro Giant"
     },
     {
+      "id": "electro_giant_evolution",
+      "canonicalCardId": "electro_giant",
+      "form": "EVOLUTION",
+      "displayName": "Electro Giant Evolution"
+    },
+    {
       "id": "phoenix_normal",
       "canonicalCardId": "phoenix",
       "form": "NORMAL",
@@ -2059,6 +2087,12 @@
       "canonicalCardId": "ronin",
       "form": "NORMAL",
       "displayName": "Ronin"
+    },
+    {
+      "id": "minion_giant_normal",
+      "canonicalCardId": "minion_giant",
+      "form": "NORMAL",
+      "displayName": "Minion Giant"
     },
     {
       "id": "cannon_normal",

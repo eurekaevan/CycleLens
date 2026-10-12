@@ -10,7 +10,7 @@ CycleLens 是一个本地优先的 Android 皇室战争手动牌序辅助工具�
 - Compose 手动记牌界面：本地卡牌搜索、Opponent Deck 和 8 张卡牌上限。
 - 手动实战 Overlay：4×2 稳定卡槽、点击记牌、Undo、新卡 Picker、拖动和折叠。
 - Overlay 可调整尺寸、详细度和背景不透明度；默认是 `COMFORTABLE + MINIMAL + 50%`。
-- 离线 Canonical Card Catalog：126 个规范卡牌、122 张可记录卡牌、4 个 Tower Troop、184 个视觉形态和 126 张本地缩略图。
+- 离线 Canonical Card Catalog：127 个规范卡牌、123 张可记录卡牌、4 个 Tower Troop、188 个视觉形态和 127 张本地缩略图。
 - MediaProjection 帧入口：Native、Balanced、Eco 输出 profile，分别将 accepted analysis frame 限制为 30、15、10 FPS。
 - 新安装默认选择 Balanced；Native 保留为 correctness/benchmark 模式。
 - Capture geometry：区分 source/output 尺寸，并统一提供 source、output、normalized 坐标映射。
